@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <title>threejs planet</title>
+    <meta charset="utf-8" content="width=device-width" />
+    <style type="text/css">
+    body{
+      margin:0;
+    }
+    canvas{
+      width:100%;
+      height:100%
+    }
+    </style>
+  </head>
+  <body ontouchmove="event.preventDefault();">
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/inflate.min.js"></script>
+    <script src="js/FBXLoader.js"></script>
+    <script src="js/OBJLoader.js"></script>
+    <script src="js/framerate.js"></script>
+    <script>
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth,window.innerHeight);
+      //load the canvas
+      document.body.appendChild(renderer.domElement);
+
+      //set the resize event
+      window.addEventListener('resize',function(){
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        camera.aspect = window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+      });
+
+      var control = new THREE.OrbitControls( camera );
+
+      camera.position.set(0,0,10);
+      var ambientLight = new THREE.AmbientLight(0xffffff,1.0);
+      scene.add(ambientLight);
+      //FBX Loader
+      var fgxloader = new THREE.FBXLoader().
+      load("asset/source/mars-bake.fbx",function(object){
+        console.log(object);
+        object.position.set(0,0,0);
+        scene.add(object);
+      },function(xhr){
+        console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
+      },function(error){
+        alert(error);
+      });
+
+      //OBJ Loader
+      //var objloader = new THREE.OBJLoader().
+      //load("asset/source/mars.obj",
+      //called when resource is loaded
+      //function(object){
+      //  object.children[0].material =
+      //  new THREE.MeshLambertMaterial({map: new THREE.TextureLoader()
+      //    .load("asset/textures/Mars_Map.jpg"),side:THREE.DoubleSide});
+      //  object.position.set(0,20,0);
+      //  scene.add(object);
+      //},
+      //called where loading is in progress
+      //function(xhr){
+      //  console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
+      //},
+      //called where loading has errors
+      //function(error){
+      //  alert(error);
+      //});
+
+      //update game parameters
+      var update = function(){
+
+      };
+
+      //render the scene
+      var render = function(){
+        renderer.render(scene,camera);
+      };
+
+      var GameLoop = function(){
+        requestAnimationFrame(GameLoop);
+        update();
+        render();
+      }
+
+      GameLoop();
+    </script>
+  </body>
+</html>

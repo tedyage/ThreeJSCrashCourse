@@ -1,0 +1,35 @@
+body{
+  margin:0;
+  background-color: #ccc;;
+}
+canvas{
+  width:100%;
+  height:100%;
+}
+.container{
+  width:960px;
+  margin:8% auto;
+  height:100%;
+  background-color: #ccc;
+  padding: 20px 0;
+}
+.top,.left,.right,.bottom{
+  width:160px;
+  height:160px;
+  background-color:#fff;
+}
+.top{
+  margin:0 400px 40px 400px;
+}
+
+.left{
+  margin:0 0 0 200px;
+}
+
+.right{
+  margin:-160px 0px 40px 600px;
+}
+
+.bottom{
+  margin:0 400px 40px 400px
+}

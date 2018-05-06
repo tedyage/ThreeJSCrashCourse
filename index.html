@@ -1,0 +1,164 @@
+<html>
+  <head>
+    <title>Three.js Crash Course</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width" name="viewport"/>
+    <style>
+    body{
+      margin:0;
+    }
+    canvas{
+      width:100%;
+      height:100%
+    }
+    </style>
+  </head>
+  <body ontouchmove="event.preventDefault()">
+    <!--basic js file-->
+    <script src="js/three.min.js"></script>
+    <!--js for controlling-->
+    <script src="js/OrbitControls.js"></script>
+    <!--js for loading object-->
+    <!--<script src="js/ObjectLoader.js"></script>-->
+    <script src="js/framerate.js"></script>
+    <script type="text/javascript">
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+      //resize event
+      window.addEventListener("resize",function(){
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        renderer.setSize(width,height);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+      });
+      //create the controls
+      var controls = new THREE.OrbitControls(camera);
+
+      //create the cube
+      var cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
+     //create a material, colour or image texture
+      var Materials = [
+        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/01.jpg'), side: THREE.FrontSide}),  //Right
+        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/02.jpg'), side: THREE.FrontSide}),  //Left
+        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/03.jpg'), side: THREE.FrontSide}),  //Top
+        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/04.jpg'), side: THREE.FrontSide}),  //Bottom
+        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/05.jpg'), side: THREE.FrontSide}),  //Front
+        new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('img/06.jpg'), side: THREE.FrontSide})   //Back
+      ];
+
+      var cubeMaterial = new THREE.MeshFaceMaterial(Materials);
+      var cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
+      scene.add(cube);
+
+      //Floor
+      var floorGeometry = new THREE.CubeGeometry(10,1,10);
+      var floorMaterial = new THREE.MeshLambertMaterial({map:new THREE.TextureLoader().load('img/Ground.jpg'),side:THREE.DoubleSide});
+      var floorCube = new THREE.Mesh(floorGeometry,floorMaterial);
+      floorCube.position.y = -5;
+      scene.add(floorCube);
+      //Ceiling
+      var ceilingGeometry = new THREE.CubeGeometry(10,1,10);
+      var ceilingMaterial = new THREE.MeshLambertMaterial({map:new THREE.TextureLoader().load('img/Ceiling.jpg'),side:THREE.DoubleSide});
+      var ceilingCube = new THREE.Mesh(ceilingGeometry,ceilingMaterial);
+      ceilingCube.position.y = 5;
+      scene.add(ceilingCube);
+      //LeftWall
+      var leftWallGeometry = new THREE.CubeGeometry(1,10,10);
+      var leftWallMaterial = new THREE.MeshLambertMaterial({map:new THREE.TextureLoader().load('img/Wall.jpg'),side:THREE.DoubleSide});
+      var leftWallCube = new THREE.Mesh(leftWallGeometry, leftWallMaterial);
+      leftWallCube.position.x = -5;
+      scene.add(leftWallCube);
+      //RightWall
+      var leftWallGeometry = new THREE.CubeGeometry(1,10,10);
+      var leftWallMaterial = new THREE.MeshLambertMaterial({map:new THREE.TextureLoader().load('img/Wall.jpg'),side:THREE.DoubleSide});
+      var leftWallCube = new THREE.Mesh(leftWallGeometry, leftWallMaterial);
+      leftWallCube.position.x = 5;
+      scene.add(leftWallCube);
+
+      //set camera position
+      camera.position.z=20;
+      //create an ambient light
+      var ambientLight = new THREE.AmbientLight(0xffffff,0.8);
+      scene.add(ambientLight);
+      //create point lights
+      var pointLight = new THREE.PointLight(0xFF0040, 4, 50);
+      scene.add(pointLight);
+      var pointLight2 = new THREE.PointLight(0x0040FF, 2, 50);
+      scene.add(pointLight2);
+      var pointLight3 = new THREE.PointLight(0x80FF80, 1, 50);
+      scene.add(pointLight3);
+      //create point light position potints
+      var sphereGeometry = new THREE.SphereGeometry(0.5);
+      var sphereMaterial = new THREE.MeshBasicMaterial({color:0xFF0040,side:THREE.DoubleSide});
+      var pointLightSphere = new THREE.Mesh(sphereGeometry,sphereMaterial);
+      scene.add(pointLightSphere);
+      var sphereGeometry2 = new THREE.SphereGeometry(0.5);
+      var sphereMaterial2 = new THREE.MeshBasicMaterial({color:0x0040FF,side:THREE.DoubleSide});
+      var pointLightSphere2 = new THREE.Mesh(sphereGeometry2,sphereMaterial2);
+      scene.add(pointLightSphere2);
+      var sphereGeometry3 = new THREE.SphereGeometry(0.5);
+      var sphereMaterial3 = new THREE.MeshBasicMaterial({color:0x80FF80,side:THREE.DoubleSide});
+      var pointLightSphere3 = new THREE.Mesh(sphereGeometry2,sphereMaterial2);
+      scene.add(pointLightSphere3);
+      //create directional light
+      var directionalLight = new THREE.DirectionalLight(0xffffff,1);
+      directionalLight.position.set(0,1,0);
+      scene.add(directionalLight);
+      //create spot lights
+      var spotLight = new THREE.SpotLight(0xFF45F6,2);
+      spotLight.position.set(0,3,0);
+      scene.add(spotLight);
+
+      //var loader = new THREE.ObjectLoader();
+      //loader.load('models/Head.json',function(object){
+      //  scene(object);
+      //})
+
+      //game logic
+      var update = function(){
+        //cube.rotation.x+=0.01;
+        //cube.rotation.y+=0.005;
+        var time = new Date() * 0.0005;
+
+        pointLight.position.x = Math.sin(time*0.7)*30;
+        pointLight.position.y = Math.cos(time*0.5)*40;
+        pointLight.position.z = Math.cos(time*0.3)*30;
+        pointLightSphere.position.x = Math.sin(time*0.7)*30;
+        pointLightSphere.position.y = Math.cos(time*0.5)*40;
+        pointLightSphere.position.z = Math.cos(time*0.3)*30;
+
+        pointLight2.position.x = Math.cos(time*0.3)*30;
+        pointLight2.position.y = Math.sin(time*0.5)*40;
+        pointLight2.position.z = Math.sin(time*0.7)*30;
+        pointLightSphere2.position.x = Math.cos(time*0.3)*30;
+        pointLightSphere2.position.y = Math.sin(time*0.5)*40;
+        pointLightSphere2.position.z = Math.sin(time*0.7)*30;
+
+        pointLight3.position.x = Math.sin(time*0.7)*30;
+        pointLight3.position.y = Math.cos(time*0.5)*40;
+        pointLight3.position.z = Math.sin(time*0.3)*30;
+        pointLightSphere3.position.x = Math.sin(time*0.7)*30;
+        pointLightSphere3.position.y = Math.cos(time*0.5)*40;
+        pointLightSphere3.position.z = Math.sin(time*0.3)*30;
+      };
+      //draw scene
+      var render = function(){
+        renderer.render(scene,camera);
+      };
+      //run game loop (update, render, repeat)
+      var GameLoop = function(){
+        requestAnimationFrame(GameLoop);
+
+        update();
+        render();
+      };
+
+      GameLoop();
+
+    </script>
+  </body>
+</html>
