@@ -18,18 +18,14 @@ canvas{
   height:160px;
   background-color:#fff;
 }
-.top{
-  margin:0 400px 40px 400px;
+.top,.bottom{
+  margin:0 400px;
 }
 
 .left{
-  margin:0 0 0 200px;
+  margin:0 0 0 240px;
 }
 
 .right{
-  margin:-160px 0px 40px 600px;
-}
-
-.bottom{
-  margin:0 400px 40px 400px
+  margin:-160px 0px 0px 560px;
 }

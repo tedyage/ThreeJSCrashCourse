@@ -2,7 +2,8 @@
 <html>
   <head>
     <title>threejs-hologram</title>
-    <meta charset="utf-8" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <link rel="stylesheet" href="css/main.css"/>
   </head>
   <body  ontouchmove="event.preventDefault();">
@@ -38,9 +39,9 @@
       var scene = new THREE.Scene();
       //初始化四台摄像机
       var camera1 = new THREE.PerspectiveCamera(45,getWidth('bottom')/getHeight('bottom'),0.1,1000);         //前方
-      var camera2 = new THREE.PerspectiveCamera(45,getWidth('right')/getHeight('right'),0.1,1000);           //右方
+      var camera2 = new THREE.PerspectiveCamera(45,getWidth('left')/getHeight('left'),0.1,1000);           //右方
       var camera3 = new THREE.PerspectiveCamera(45,getWidth('top')/getHeight('top'),0.1,1000);               //后方
-      var camera4 = new THREE.PerspectiveCamera(45,getWidth('left')/getHeight('left'),0.1,1000);             //左方
+      var camera4 = new THREE.PerspectiveCamera(45,getWidth('right')/getHeight('right'),0.1,1000);             //左方
       //初始化四个渲染器
       var renderer1 = new THREE.WebGLRenderer();     //前方
       var renderer2 = new THREE.WebGLRenderer();     //右方
@@ -48,22 +49,22 @@
       var renderer4 = new THREE.WebGLRenderer();     //左方
       //渲染器设置宽高
       renderer1.setSize(window.getWidth('bottom'),window.getHeight('bottom'));
-      renderer2.setSize(window.getWidth('right'),window.getHeight('right'));
+      renderer2.setSize(window.getWidth('left'),window.getHeight('left'));
       renderer3.setSize(window.getWidth('top'),window.getHeight('top'));
-      renderer4.setSize(window.getWidth('left'),window.getHeight('left'));
+      renderer4.setSize(window.getWidth('right'),window.getHeight('right'));
       //将渲染目标与相应div绑定
       document.getElementsByClassName("bottom")[0].appendChild(renderer1.domElement);
-      document.getElementsByClassName("right")[0].appendChild(renderer2.domElement);
+      document.getElementsByClassName("left")[0].appendChild(renderer2.domElement);
       document.getElementsByClassName("top")[0].appendChild(renderer3.domElement);
-      document.getElementsByClassName("left")[0].appendChild(renderer4.domElement);
+      document.getElementsByClassName("right")[0].appendChild(renderer4.domElement);
       //定义摄像机轨迹控制
       //var control = new THREE.OrbitControls(camera1,renderer1.domElement);
       //control
       //设置摄像机位置
       camera1.position.set(0,0,5);
-      camera2.position.set(5,0,0);
+      camera2.position.set(-5,0,0);
       camera3.position.set(0,0,-5);
-      camera4.position.set(-5,0,0);
+      camera4.position.set(5,0,0);
       //设置摄像机镜头目标坐标
       camera1.lookAt(0,0,0);
       camera2.lookAt(0,0,0);
@@ -78,7 +79,7 @@
       var ambientLight = new THREE.AmbientLight(0xffffff,1.0);
       scene.add(ambientLight);
       //定义方块几何结构
-      var cubeGeometry = new THREE.BoxGeometry(2,2,2);
+      var cubeGeometry = new THREE.BoxGeometry(2.5,2.5,2.5);
       //定义方块材质
       var materials = [
         new THREE.MeshLambertMaterial({map:new THREE.TextureLoader().load("img/01.jpg"),side:THREE.DoubleSide}),
@@ -92,8 +93,8 @@
       //定义方块物体
       var cube = new THREE.Mesh(cubeGeometry,cubeMaterials);
 
-      cube.rotateZ(Math.PI/4);
-      cube.rotateX(Math.PI/4);
+      //cube.rotateZ(Math.PI/4);
+      //cube.rotateX(Math.PI/4);
 
       //将物体放入场景中。
       scene.add(cube);
@@ -101,15 +102,15 @@
       var rotateSpeed = 0.01;
       //定义修改函数，用于修改场景参数
       var update = function(){
-        cube.rotation.y-=rotateSpeed;
+        cube.rotation.y+=rotateSpeed;
       };
 
       //定义渲染函数，
       var render = function(){
         renderer1.render(scene,camera1);
-        renderer2.render(scene,camera2);
+        renderer2.render(scene,camera4);
         renderer3.render(scene,camera3);
-        renderer4.render(scene,camera4);
+        renderer4.render(scene,camera2);
       };
       //定义循环执行函数
       var GameLoop = function(){
