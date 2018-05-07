@@ -39,14 +39,14 @@
       var scene = new THREE.Scene();
       //初始化四台摄像机
       var camera1 = new THREE.PerspectiveCamera(45,getWidth('bottom')/getHeight('bottom'),0.1,1000);         //前方
-      var camera2 = new THREE.PerspectiveCamera(45,getWidth('left')/getHeight('left'),0.1,1000);           //右方
+      var camera2 = new THREE.PerspectiveCamera(45,getWidth('right')/getHeight('right'),0.1,1000);           //右方
       var camera3 = new THREE.PerspectiveCamera(45,getWidth('top')/getHeight('top'),0.1,1000);               //后方
-      var camera4 = new THREE.PerspectiveCamera(45,getWidth('right')/getHeight('right'),0.1,1000);             //左方
+      var camera4 = new THREE.PerspectiveCamera(45,getWidth('left')/getHeight('left'),0.1,1000);             //左方
       //初始化四个渲染器
       var renderer1 = new THREE.WebGLRenderer();     //前方
-      var renderer2 = new THREE.WebGLRenderer();     //右方
+      var renderer2 = new THREE.WebGLRenderer();     //左方
       var renderer3 = new THREE.WebGLRenderer();     //后方
-      var renderer4 = new THREE.WebGLRenderer();     //左方
+      var renderer4 = new THREE.WebGLRenderer();     //右方
       //渲染器设置宽高
       renderer1.setSize(window.getWidth('bottom'),window.getHeight('bottom'));
       renderer2.setSize(window.getWidth('left'),window.getHeight('left'));
@@ -62,9 +62,9 @@
       //control
       //设置摄像机位置
       camera1.position.set(0,0,5);
-      camera2.position.set(-5,0,0);
+      camera2.position.set(5,0,0);
       camera3.position.set(0,0,-5);
-      camera4.position.set(5,0,0);
+      camera4.position.set(-5,0,0);
       //设置摄像机镜头目标坐标
       camera1.lookAt(0,0,0);
       camera2.lookAt(0,0,0);
@@ -72,8 +72,8 @@
       camera4.lookAt(0,0,0);
       //设置摄像机头部朝向
       camera1.rotateZ(Math.PI);
-      camera2.rotateZ(Math.PI/2);
-      camera4.rotateZ(3*Math.PI/2);
+      camera2.rotateZ(3*Math.PI/2);
+      camera4.rotateZ(Math.PI/2);
 
       //定义光照
       var ambientLight = new THREE.AmbientLight(0xffffff,1.0);
@@ -108,9 +108,9 @@
       //定义渲染函数，
       var render = function(){
         renderer1.render(scene,camera1);
-        renderer2.render(scene,camera4);
+        renderer2.render(scene,camera2);
         renderer3.render(scene,camera3);
-        renderer4.render(scene,camera2);
+        renderer4.render(scene,camera4);
       };
       //定义循环执行函数
       var GameLoop = function(){
