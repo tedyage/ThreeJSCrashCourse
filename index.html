@@ -80,7 +80,9 @@
       scene.add(leftWallCube);
 
       //set camera position
-      camera.position.z=20;
+      camera.position.x=-14;
+      camera.position.z=14;
+      camera.lookAt(0,0,0);
       //create an ambient light
       var ambientLight = new THREE.AmbientLight(0xffffff,0.8);
       scene.add(ambientLight);

@@ -1,6 +1,6 @@
 body{
   margin:0;
-  background-color: #ccc;;
+  background-color: #000;;
 }
 canvas{
   width:100%;
@@ -10,7 +10,7 @@ canvas{
   width:960px;
   margin:8% auto;
   height:100%;
-  background-color: #ccc;
+  background-color: #000;
   padding: 20px 0;
 }
 .top,.left,.right,.bottom{
