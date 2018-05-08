@@ -33,6 +33,16 @@
         else
           return parseFloat(element[0].offsetHeight);
       };
+
+      //设置top/left/right/bottom的高度与绝对位置。
+      var heightValue = getWidth("top")+"px";
+      document.getElementsByClassName("top")[0].style.height=heightValue;
+      document.getElementsByClassName("left")[0].style.height=heightValue;
+      document.getElementsByClassName("right")[0].style.height=heightValue;
+      document.getElementsByClassName("bottom")[0].style.height=heightValue;
+      document.getElementsByClassName("right")[0].style.top=heightValue;
+      document.getElementsByClassName("left")[0].style.top=heightValue;
+      document.getElementsByClassName("bottom")[0].style.top=parseFloat(heightValue) * 2 + 'px';
     </script>
     <script>
       //初始化场景
