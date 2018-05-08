@@ -45,9 +45,9 @@
       document.getElementsByClassName("bottom")[0].style.top=parseFloat(heightValue) * 2 + 'px';
     </script>
     <script>
-      //初始化场景
+      //初始化四个场景
       var scene = new THREE.Scene();
-      //初始化四台摄像机
+      //初始化一台摄像机
       var camera1 = new THREE.PerspectiveCamera(45,getWidth('bottom')/getHeight('bottom'),0.1,1000);         //前方
       var camera2 = new THREE.PerspectiveCamera(45,getWidth('right')/getHeight('right'),0.1,1000);           //右方
       var camera3 = new THREE.PerspectiveCamera(45,getWidth('top')/getHeight('top'),0.1,1000);               //后方
@@ -68,7 +68,10 @@
       document.getElementsByClassName("top")[0].appendChild(renderer3.domElement);
       document.getElementsByClassName("right")[0].appendChild(renderer4.domElement);
       //定义摄像机轨迹控制
-      //var control = new THREE.OrbitControls(camera1,renderer1.domElement);
+      //var control1 = new THREE.OrbitControls(camera1,renderer1.domElement);
+      //control1.autoRotate = true;
+      //control1.enableZoom = false;
+      //control1.enablePan = false;
       //control
       //设置摄像机位置
       camera1.position.set(0,0,5);
@@ -88,16 +91,17 @@
       //定义光照
       var ambientLight = new THREE.AmbientLight(0xffffff,1.0);
       scene.add(ambientLight);
+
       //定义方块几何结构
       var cubeGeometry = new THREE.BoxGeometry(2.5,2.5,2.5);
       //定义方块材质
       var materials = [
-        new THREE.MeshLambertMaterial({map:new THREE.TextureLoader().load("img/01.jpg"),side:THREE.DoubleSide}),
-        new THREE.MeshLambertMaterial({map:new THREE.TextureLoader().load("img/02.jpg"),side:THREE.DoubleSide}),
-        new THREE.MeshLambertMaterial({map:new THREE.TextureLoader().load("img/03.jpg"),side:THREE.DoubleSide}),
-        new THREE.MeshLambertMaterial({map:new THREE.TextureLoader().load("img/04.jpg"),side:THREE.DoubleSide}),
-        new THREE.MeshLambertMaterial({map:new THREE.TextureLoader().load("img/05.jpg"),side:THREE.DoubleSide}),
-        new THREE.MeshLambertMaterial({map:new THREE.TextureLoader().load("img/06.jpg"),side:THREE.DoubleSide}),
+        new THREE.MeshLambertMaterial({color:0xff0000,side:THREE.DoubleSide}),
+        new THREE.MeshLambertMaterial({color:0x00ff00,side:THREE.DoubleSide}),
+        new THREE.MeshLambertMaterial({color:0x0000ff,side:THREE.DoubleSide}),
+        new THREE.MeshLambertMaterial({color:0xff00ff,side:THREE.DoubleSide}),
+        new THREE.MeshLambertMaterial({color:0xffff00,side:THREE.DoubleSide}),
+        new THREE.MeshLambertMaterial({color:0x00ffff,side:THREE.DoubleSide}),
       ];
       var cubeMaterials = new THREE.MeshFaceMaterial(materials);
       //定义方块物体
@@ -109,10 +113,22 @@
       //将物体放入场景中。
       scene.add(cube);
 
-      var rotateSpeed = 0.01;
       //定义修改函数，用于修改场景参数
+      var lastAzimuthalAngle;
+      var rotateSpeed = 0.01;
       var update = function(){
         cube.rotation.y+=rotateSpeed;
+        //control1.update();
+        //var azimuthalAngle = control1.getAzimuthalAngle();
+        //if(lastAzimuthalAngle === azimuthalAngle)
+        //  return;
+        //lastAzimuthalAngle = azimuthalAngle;
+        //console.log(azimuthalAngle);
+        //camera2.rotation = new THREE.Euler(azimuthalAngle,0,0);
+        //camera2.updateMatrix();
+        //if(control1.getAzimuthalAngle()!==0)
+          //console.log(control1.getAzimuthalAngle());
+
       };
 
       //定义渲染函数，
