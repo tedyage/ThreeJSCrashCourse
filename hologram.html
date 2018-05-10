@@ -71,27 +71,29 @@
       document.getElementsByClassName("right")[0].appendChild(renderer4.domElement);
       //定义控制器
       var control = new THREE.OrbitControls(camera);
-      //control.enableZoom = false;
-      //control.enablePan = false;
+      control.enableZoom = false;
+      control.enablePan = false;
       //设置摄像机位置
-      var cameraZ=200;
+      var cameraZ=180;
       camera.position.set(0,0,cameraZ);
       //设置摄像机镜头目标坐标
       camera.lookAt(0,0,0);
 
       //定义光照
-      //var ambientLight = new THREE.AmbientLight(0xffffff,1.0);
-      //scene1.add(ambientLight.clone());
-      //scene2.add(ambientLight.clone());
-      //scene3.add(ambientLight.clone());
-      //scene4.add(ambientLight.clone());
+      var ambientLight = new THREE.AmbientLight(0xffffff,0.2);
+      scene1.add(ambientLight.clone());
+      scene2.add(ambientLight.clone());
+      scene3.add(ambientLight.clone());
+      scene4.add(ambientLight.clone());
 
       var directionLight1 = new THREE.DirectionalLight(0xffffff,0.8);
       directionLight1.position.set(300,0,400);
-      //directionLight1.castShadow = true;
-      var directionLight2 = new THREE.DirectionalLight(0x9999ff,0.6);
+      directionLight1.castShadow = true;
+      directionLight1.mapSize = new THREE.Vector2(1024,1024);
+      var directionLight2 = new THREE.DirectionalLight(0x9999ff,0.2);
       directionLight2.position.set(-300,0,-400);
-      //directionLight2.castShadow = true;
+      directionLight2.castShadow = true;
+      directionLight2.mapSize = new THREE.Vector2(1024,1024);
       var light1Clone1 = directionLight1.clone();
       var light1Clone2 = directionLight1.clone();
       var light1Clone3 = directionLight1.clone();
@@ -108,31 +110,30 @@
       scene2.add(light2Clone2);
       scene3.add(light2Clone3);
       scene4.add(light2Clone4);
-      //定义方块几何结构
-      var cubeGeometry = new THREE.BoxGeometry(2.5,2.5,2.5);
 
-      //定义方块材质
-      var materials = [
-        new THREE.MeshLambertMaterial({color:0xff0000,side:THREE.DoubleSide}),      //红色，右面
-        new THREE.MeshLambertMaterial({color:0x00ff00,side:THREE.DoubleSide}),      //绿色，左面
-        new THREE.MeshLambertMaterial({color:0x0000ff,side:THREE.DoubleSide}),      //深蓝，上面
-        new THREE.MeshLambertMaterial({color:0xff00ff,side:THREE.DoubleSide}),      //粉色，下面
-        new THREE.MeshLambertMaterial({color:0xffff00,side:THREE.DoubleSide}),      //黄色，前面
-        new THREE.MeshLambertMaterial({color:0x00ffff,side:THREE.DoubleSide}),      //浅蓝，后面
-      ];
-      var cubeMaterials = new THREE.MeshFaceMaterial(materials);
+      //背景盒
+      //var backgroundGeometry = new THREE.BoxGeometry(1000,1000,1000);
+      //var backgroundMaterial = new THREE.MeshBasicMaterial(
+      //  {map:new THREE.TextureLoader().load("asset/textures/background-stars.jpg"),side:THREE.DoubleSide});
+      //var background = new THREE.Mesh(backgroundGeometry,backgroundMaterial);
+      //background.position.set(0,0,0)
+      //scene1.add(background.clone());
+      //scene2.add(background.clone());
+      //scene3.add(background.clone());
+      //scene4.add(background.clone());
 
-      //定义方块物体
-      var cube = new THREE.Mesh(cubeGeometry,cubeMaterials);
-
+      //载入fbx物体
       var mesh1,mesh2,mesh3,mesh4;
       var fgxloader = new THREE.FBXLoader().
       load("asset/source/threejs_mars.fbx",function(object){
-        console.log(object.toJSON());
         mesh1=object.clone().rotateZ(Math.PI);
         mesh2=object.clone().rotateZ(Math.PI);
         mesh3=object.clone().rotateZ(Math.PI);
         mesh4=object.clone().rotateZ(Math.PI);
+        mesh1.receiveShadow = true;
+        mesh2.receiveShadow = true;
+        mesh3.receiveShadow = true;
+        mesh4.receiveShadow = true;
         scene1.add(mesh1);
         scene2.add(mesh2);
         scene3.add(mesh3);
@@ -143,15 +144,32 @@
         alert(error);
       });
 
-      //将物体放入场景中。
-      //scene1.add(cube.clone().rotateZ(Math.PI));
-      //scene2.add(cube.clone().rotateZ(Math.PI));
-      //scene3.add(cube.clone().rotateZ(Math.PI));
-      //scene4.add(cube.clone().rotateZ(Math.PI));
+      var cloud1,cloud2,cloud3,cloud4
+      fgxloader = new THREE.FBXLoader().
+      load("asset/source/threejs_marscloud.fbx",function(object){
+        console.log(object.toJSON());
+        cloud1=object.clone().rotateZ(Math.PI);
+        cloud2=object.clone().rotateZ(Math.PI);
+        cloud3=object.clone().rotateZ(Math.PI);
+        cloud4=object.clone().rotateZ(Math.PI);
+        cloud1.receiveShadow = true;
+        cloud2.receiveShadow = true;
+        cloud3.receiveShadow = true;
+        cloud4.receiveShadow = true;
+        scene1.add(cloud1);
+        scene2.add(cloud2);
+        scene3.add(cloud3);
+        scene4.add(cloud4);
+      },function(xhr){
+        console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
+      },function(error){
+        alert(error);
+      });
 
       //定义修改函数，用于修改场景参数
       var lightSpeed = 0;
       var objectSpeed = 0.004;
+      var cloudSpeed = 0.007;
       var update = function(){
         lightSpeed+=0.005;
         light1Clone1.position.x = 500*Math.cos(Math.PI/2+lightSpeed);
@@ -177,6 +195,13 @@
         mesh2.rotateY(objectSpeed);
         mesh3.rotateY(objectSpeed);
         mesh4.rotateY(objectSpeed);
+
+        if(cloud1===undefined||cloud2===undefined||cloud3===undefined||cloud4===undefined)
+          return;
+        cloud1.rotateY(cloudSpeed);
+        cloud2.rotateY(cloudSpeed);
+        cloud3.rotateY(cloudSpeed);
+        cloud4.rotateY(cloudSpeed);
       };
 
       //定义渲染函数，

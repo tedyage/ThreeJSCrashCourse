@@ -2,7 +2,7 @@
   <head>
     <title>Three.js Crash Course</title>
     <meta charset="utf-8"/>
-    <meta content="width=device-width" name="viewport"/>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
     <style>
     body{
       margin:0;
@@ -18,8 +18,6 @@
     <script src="js/three.min.js"></script>
     <!--js for controlling-->
     <script src="js/OrbitControls.js"></script>
-    <!--js for loading object-->
-    <!--<script src="js/ObjectLoader.js"></script>-->
     <script src="js/framerate.js"></script>
     <script type="text/javascript">
       var scene = new THREE.Scene();
@@ -114,11 +112,6 @@
       var spotLight = new THREE.SpotLight(0xFF45F6,2);
       spotLight.position.set(0,3,0);
       scene.add(spotLight);
-
-      //var loader = new THREE.ObjectLoader();
-      //loader.load('models/Head.json',function(object){
-      //  scene(object);
-      //})
 
       //game logic
       var update = function(){

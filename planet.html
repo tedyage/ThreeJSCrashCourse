@@ -1,7 +1,8 @@
 <html>
   <head>
     <title>threejs planet</title>
-    <meta charset="utf-8" content="width=device-width" />
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
     <style type="text/css">
     body{
       margin:0;
@@ -38,18 +39,46 @@
       camera.position.set(0,0,200);
       camera.lookAt(0,0,0);
 
+      var ambientLight = new THREE.AmbientLight(0xffffff,0.2)
+      scene.add(ambientLight);
+
       var directionLight1 = new THREE.DirectionalLight(0xffffff,0.8);
       directionLight1.position.set(300,0,400);
-      var directionLight2 = new THREE.DirectionalLight(0x9999ff,0.6);
+      directionLight1.castShadow = true;
+      directionLight1.mapSize = new THREE.Vector2(1024,1024);
+      var directionLight2 = new THREE.DirectionalLight(0x9999ff,0.2);
       directionLight2.position.set(-300,0,-400);
+      directionLight2.castShadow = true;
+      directionLight2.mapSize = new THREE.Vector2(1024,1024);
       scene.add(directionLight1)
       scene.add(directionLight2)
+
+      //background-box
+      var backgroundGeometry = new THREE.BoxGeometry(1000,1000,1000);
+      var backgroundMaterial = new THREE.MeshBasicMaterial(
+        {map:new THREE.TextureLoader().load("asset/textures/background-stars.jpg"),side:THREE.DoubleSide});
+      var background = new THREE.Mesh(backgroundGeometry,backgroundMaterial);
+      background.position.set(0,0,0)
+      scene.add(background);
 
       //FBX Loader
       var fgxloader = new THREE.FBXLoader().
       load("asset/source/threejs_mars.fbx",function(object){
         console.log(object.toJSON());
         object.position.set(0,0,0);
+        object.receiveShadow = true;
+        scene.add(object);
+      },function(xhr){
+        console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
+      },function(error){
+        alert(error);
+      });
+
+      fgxloader = new THREE.FBXLoader().
+      load("asset/source/threejs_marscloud.fbx",function(object){
+        console.log(object.toJSON());
+        object.position.set(0,0,0);
+        object.receiveShadow = true;
         scene.add(object);
       },function(xhr){
         console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
