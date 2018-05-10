@@ -16,6 +16,8 @@
     <script src="js/three.min.js"></script>
     <script src="js/OrbitControls.js"></script>
     <script src="js/framerate.js"></script>
+    <script src="js/inflate.min.js"></script>
+    <script src="js/FBXLoader.js"></script>
     <script>
       //获取定影样式类名的元素的宽度
       var getWidth = function(className){
@@ -46,12 +48,12 @@
     </script>
     <script>
       //初始化四个场景
-      var scene = new THREE.Scene();
+      var scene1 = new THREE.Scene();    //前方
+      var scene2 = new THREE.Scene();    //右方
+      var scene3 = new THREE.Scene();    //后方
+      var scene4 = new THREE.Scene();    //左方
       //初始化一台摄像机
-      var camera1 = new THREE.PerspectiveCamera(45,getWidth('bottom')/getHeight('bottom'),0.1,1000);         //前方
-      var camera2 = new THREE.PerspectiveCamera(45,getWidth('right')/getHeight('right'),0.1,1000);           //右方
-      var camera3 = new THREE.PerspectiveCamera(45,getWidth('top')/getHeight('top'),0.1,1000);               //后方
-      var camera4 = new THREE.PerspectiveCamera(45,getWidth('left')/getHeight('left'),0.1,1000);             //左方
+      var camera = new THREE.PerspectiveCamera(75,getWidth('bottom')/getHeight('bottom'),0.1,1000);
       //初始化四个渲染器
       var renderer1 = new THREE.WebGLRenderer();     //前方
       var renderer2 = new THREE.WebGLRenderer();     //左方
@@ -67,76 +69,122 @@
       document.getElementsByClassName("left")[0].appendChild(renderer2.domElement);
       document.getElementsByClassName("top")[0].appendChild(renderer3.domElement);
       document.getElementsByClassName("right")[0].appendChild(renderer4.domElement);
-      //定义摄像机轨迹控制
-      //var control1 = new THREE.OrbitControls(camera1,renderer1.domElement);
-      //control1.autoRotate = true;
-      //control1.enableZoom = false;
-      //control1.enablePan = false;
-      //control
+      //定义控制器
+      var control = new THREE.OrbitControls(camera);
+      //control.enableZoom = false;
+      //control.enablePan = false;
       //设置摄像机位置
-      camera1.position.set(0,0,5);
-      camera2.position.set(5,0,0);
-      camera3.position.set(0,0,-5);
-      camera4.position.set(-5,0,0);
+      var cameraZ=200;
+      camera.position.set(0,0,cameraZ);
       //设置摄像机镜头目标坐标
-      camera1.lookAt(0,0,0);
-      camera2.lookAt(0,0,0);
-      camera3.lookAt(0,0,0);
-      camera4.lookAt(0,0,0);
-      //设置摄像机头部朝向
-      camera1.rotateZ(Math.PI);
-      camera2.rotateZ(3*Math.PI/2);
-      camera4.rotateZ(Math.PI/2);
+      camera.lookAt(0,0,0);
 
       //定义光照
-      var ambientLight = new THREE.AmbientLight(0xffffff,1.0);
-      scene.add(ambientLight);
+      //var ambientLight = new THREE.AmbientLight(0xffffff,1.0);
+      //scene1.add(ambientLight.clone());
+      //scene2.add(ambientLight.clone());
+      //scene3.add(ambientLight.clone());
+      //scene4.add(ambientLight.clone());
 
+      var directionLight1 = new THREE.DirectionalLight(0xffffff,0.8);
+      directionLight1.position.set(300,0,400);
+      //directionLight1.castShadow = true;
+      var directionLight2 = new THREE.DirectionalLight(0x9999ff,0.6);
+      directionLight2.position.set(-300,0,-400);
+      //directionLight2.castShadow = true;
+      var light1Clone1 = directionLight1.clone();
+      var light1Clone2 = directionLight1.clone();
+      var light1Clone3 = directionLight1.clone();
+      var light1Clone4 = directionLight1.clone();
+      var light2Clone1 = directionLight2.clone();
+      var light2Clone2 = directionLight2.clone();
+      var light2Clone3 = directionLight2.clone();
+      var light2Clone4 = directionLight2.clone();
+      scene1.add(light1Clone1);
+      scene2.add(light1Clone2);
+      scene3.add(light1Clone3);
+      scene4.add(light1Clone4);
+      scene1.add(light2Clone1);
+      scene2.add(light2Clone2);
+      scene3.add(light2Clone3);
+      scene4.add(light2Clone4);
       //定义方块几何结构
       var cubeGeometry = new THREE.BoxGeometry(2.5,2.5,2.5);
+
       //定义方块材质
       var materials = [
-        new THREE.MeshLambertMaterial({color:0xff0000,side:THREE.DoubleSide}),
-        new THREE.MeshLambertMaterial({color:0x00ff00,side:THREE.DoubleSide}),
-        new THREE.MeshLambertMaterial({color:0x0000ff,side:THREE.DoubleSide}),
-        new THREE.MeshLambertMaterial({color:0xff00ff,side:THREE.DoubleSide}),
-        new THREE.MeshLambertMaterial({color:0xffff00,side:THREE.DoubleSide}),
-        new THREE.MeshLambertMaterial({color:0x00ffff,side:THREE.DoubleSide}),
+        new THREE.MeshLambertMaterial({color:0xff0000,side:THREE.DoubleSide}),      //红色，右面
+        new THREE.MeshLambertMaterial({color:0x00ff00,side:THREE.DoubleSide}),      //绿色，左面
+        new THREE.MeshLambertMaterial({color:0x0000ff,side:THREE.DoubleSide}),      //深蓝，上面
+        new THREE.MeshLambertMaterial({color:0xff00ff,side:THREE.DoubleSide}),      //粉色，下面
+        new THREE.MeshLambertMaterial({color:0xffff00,side:THREE.DoubleSide}),      //黄色，前面
+        new THREE.MeshLambertMaterial({color:0x00ffff,side:THREE.DoubleSide}),      //浅蓝，后面
       ];
       var cubeMaterials = new THREE.MeshFaceMaterial(materials);
+
       //定义方块物体
       var cube = new THREE.Mesh(cubeGeometry,cubeMaterials);
 
-      //cube.rotateZ(Math.PI/4);
-      //cube.rotateX(Math.PI/4);
+      var mesh1,mesh2,mesh3,mesh4;
+      var fgxloader = new THREE.FBXLoader().
+      load("asset/source/threejs_mars.fbx",function(object){
+        console.log(object.toJSON());
+        mesh1=object.clone().rotateZ(Math.PI);
+        mesh2=object.clone().rotateZ(Math.PI);
+        mesh3=object.clone().rotateZ(Math.PI);
+        mesh4=object.clone().rotateZ(Math.PI);
+        scene1.add(mesh1);
+        scene2.add(mesh2);
+        scene3.add(mesh3);
+        scene4.add(mesh4);
+      },function(xhr){
+        console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
+      },function(error){
+        alert(error);
+      });
 
       //将物体放入场景中。
-      scene.add(cube);
+      //scene1.add(cube.clone().rotateZ(Math.PI));
+      //scene2.add(cube.clone().rotateZ(Math.PI));
+      //scene3.add(cube.clone().rotateZ(Math.PI));
+      //scene4.add(cube.clone().rotateZ(Math.PI));
 
       //定义修改函数，用于修改场景参数
-      var lastAzimuthalAngle;
-      var rotateSpeed = 0.01;
+      var lightSpeed = 0;
+      var objectSpeed = 0.004;
       var update = function(){
-        cube.rotation.y+=rotateSpeed;
-        //control1.update();
-        //var azimuthalAngle = control1.getAzimuthalAngle();
-        //if(lastAzimuthalAngle === azimuthalAngle)
-        //  return;
-        //lastAzimuthalAngle = azimuthalAngle;
-        //console.log(azimuthalAngle);
-        //camera2.rotation = new THREE.Euler(azimuthalAngle,0,0);
-        //camera2.updateMatrix();
-        //if(control1.getAzimuthalAngle()!==0)
-          //console.log(control1.getAzimuthalAngle());
+        lightSpeed+=0.005;
+        light1Clone1.position.x = 500*Math.cos(Math.PI/2+lightSpeed);
+        light1Clone1.position.z = 500*Math.sin(Math.PI/2+lightSpeed);
+        light1Clone2.position.x = 500*Math.cos(Math.PI/2+lightSpeed);
+        light1Clone2.position.z = 500*Math.sin(Math.PI/2+lightSpeed);
+        light1Clone3.position.x = 500*Math.cos(Math.PI/2+lightSpeed);
+        light1Clone3.position.z = 500*Math.sin(Math.PI/2+lightSpeed);
+        light1Clone4.position.x = 500*Math.cos(Math.PI/2+lightSpeed);
+        light1Clone4.position.z = 500*Math.sin(Math.PI/2+lightSpeed);
+        light2Clone1.position.x = 500*Math.cos(-Math.PI/2+lightSpeed);
+        light2Clone1.position.z = 500*Math.sin(-Math.PI/2+lightSpeed);
+        light2Clone2.position.x = 500*Math.cos(-Math.PI/2+lightSpeed);
+        light2Clone2.position.z = 500*Math.sin(-Math.PI/2+lightSpeed);
+        light2Clone3.position.x = 500*Math.cos(-Math.PI/2+lightSpeed);
+        light2Clone3.position.z = 500*Math.sin(-Math.PI/2+lightSpeed);
+        light2Clone4.position.x = 500*Math.cos(-Math.PI/2+lightSpeed);
+        light2Clone4.position.z = 500*Math.sin(-Math.PI/2+lightSpeed);
 
+        if(mesh1===undefined||mesh2===undefined||mesh3===undefined||mesh4===undefined)
+          return;
+        mesh1.rotateY(objectSpeed);
+        mesh2.rotateY(objectSpeed);
+        mesh3.rotateY(objectSpeed);
+        mesh4.rotateY(objectSpeed);
       };
 
       //定义渲染函数，
       var render = function(){
-        renderer1.render(scene,camera1);
-        renderer2.render(scene,camera2);
-        renderer3.render(scene,camera3);
-        renderer4.render(scene,camera4);
+        renderer1.render(scene1,camera.clone());
+        renderer2.render(scene2,camera.clone().translateX(-cameraZ).translateZ(-cameraZ).rotateY(-Math.PI/2).rotateZ(Math.PI/2));
+        renderer3.render(scene3,camera.clone().translateZ(-cameraZ*2).rotateY(Math.PI).rotateZ(Math.PI));
+        renderer4.render(scene4,camera.clone().translateX(cameraZ).translateZ(-cameraZ).rotateY(Math.PI/2).rotateZ(-Math.PI/2));
       };
       //定义循环执行函数
       var GameLoop = function(){
