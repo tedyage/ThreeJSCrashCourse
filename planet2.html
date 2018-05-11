@@ -1,0 +1,188 @@
+<html>
+  <head>
+    <title>threejs planet</title>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
+    <style type="text/css">
+    body{
+      margin:0;
+    }
+    canvas{
+      width:100%;
+      height:100%
+    }
+    </style>
+  </head>
+  <body ontouchmove="event.preventDefault();">
+    <script src="js/three.min.js"></script>
+    <script src="js/inflate.min.js"></script>
+    <script src="js/FBXLoader.js"></script>
+    <script src="js/framerate.js"></script>
+    <script>
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+      var renderer = new THREE.WebGLRenderer();
+      var touchDown = false;
+
+      renderer.setSize(window.innerWidth,window.innerHeight);
+      //load the canvas
+      document.body.appendChild(renderer.domElement);
+
+      //set the resize event
+      window.addEventListener('resize',function(){
+        renderer.setSize(window.innerWidth,window.innerHeight);
+        camera.aspect = window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+      });
+
+      camera.position.set(0,0,200);
+      camera.lookAt(0,0,0);
+
+      var ambientLight = new THREE.AmbientLight(0xffffff,0.2)
+      scene.add(ambientLight);
+
+      var directionLight1 = new THREE.DirectionalLight(0xffffff,0.8);
+      directionLight1.position.set(300,0,400);
+      directionLight1.castShadow = true;
+      directionLight1.mapSize = new THREE.Vector2(1024,1024);
+      var directionLight2 = new THREE.DirectionalLight(0x9999ff,0.2);
+      directionLight2.position.set(-300,0,-400);
+      directionLight2.castShadow = true;
+      directionLight2.mapSize = new THREE.Vector2(1024,1024);
+      scene.add(directionLight1)
+      scene.add(directionLight2)
+
+      //background-box
+      var backgroundGeometry = new THREE.BoxGeometry(1000,1000,1000);
+      var backgroundMaterial = new THREE.MeshBasicMaterial(
+        {map:new THREE.TextureLoader().load("asset/textures/background-stars.jpg"),side:THREE.DoubleSide});
+      var background = new THREE.Mesh(backgroundGeometry,backgroundMaterial);
+      background.position.set(0,0,0)
+      scene.add(background);
+
+      //FBX Loader
+      var mesh1;
+      var fgxloader = new THREE.FBXLoader().
+      load("asset/source/threejs_mars.fbx",function(object){
+        object.position.set(0,0,0);
+        object.receiveShadow = true;
+        scene.add(object);
+        mesh1 = object;
+      },function(xhr){
+        console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
+      },function(error){
+        alert(error);
+      });
+
+      var mesh2;
+      fgxloader = new THREE.FBXLoader().
+      load("asset/source/threejs_marscloud.fbx",function(object){
+        object.position.set(0,0,0);
+        object.receiveShadow = true;
+        scene.add(object);
+        mesh2 = object;
+      },function(xhr){
+        console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
+      },function(error){
+        alert(error);
+      });
+
+      //update game parameters
+      var lightRotateSpeed = 0.005,cloudRotateSpeed = -0.009,planetRotateSpeed = -0.007;
+      var lightRotateAngle = 0;
+      var update = function(){
+        if(!touchDown){
+          lightRotateAngle+=lightRotateSpeed;
+          directionLight1.position.x = 500*Math.cos(Math.PI/2+lightRotateAngle);
+          directionLight1.position.z = 500*Math.sin(Math.PI/2+lightRotateAngle);
+          directionLight2.position.x = 500*Math.cos(-Math.PI/2+lightRotateAngle);
+          directionLight2.position.z = 500*Math.sin(-Math.PI/2+lightRotateAngle);
+
+          if(mesh1===undefined)
+            return;
+          //mesh1.rotateY(planetRotateSpeed);
+
+          if(mesh2 === undefined)
+            return;
+          mesh2.rotateY(cloudRotateSpeed)
+        }
+      };
+
+      //render the scene
+      var render = function(){
+        renderer.render(scene,camera);
+      };
+
+      var GameLoop = function(){
+        requestAnimationFrame(GameLoop);
+        update();
+        render();
+      }
+
+      GameLoop();
+    </script>
+    <script>
+      var mouseX=0, mouseY=0;
+      var model1StartRotation;
+      var rotateModels = function(model,startRotation,deltaAngleX,deltaAngleY,speed){
+        //var rotateSpeed = Math.abs(speed);
+        //model.rotateY(deltaX/(20000*rotateSpeed));
+        //model.rotateX(-deltaY/(20000*rotateSpeed));
+        model.rotation.x = startRotation.x + deltaAngleY/speed;
+        model.rotation.y = startRotation.y + deltaAngleX/speed;
+      };
+
+      var touchstart = function(event){
+        event.preventDefault();
+        touchDown = true;
+        var targetTouches = event.targetTouches;
+        //排除无接触与三只手指以上接触的。
+        if(event.targetTouches === null|| event.targetTouches.length<=0||event.targetTouches.length>2)
+          return;
+        //单手指触碰，旋转物体
+        if(event.targetTouches.length==1){
+          mouseX = event.targetTouches[0].pageX;
+          mouseY = event.targetTouches[0].pageY;
+          model1StartRotation = mesh1.rotation;
+        }
+        //两个手指触碰，缩放物体
+        else{
+
+        }
+      };
+
+      var touchmove = function(event){
+        event.preventDefault();
+        //如果物体在运动中，则touchmove事件不作任何事情。
+        if(!touchDown)
+          return;
+        //排除无接触与三只手指以上接触的。
+        if(event.targetTouches === null|| event.targetTouches.length<=0||event.targetTouches.length>2)
+          return;
+        //单手指触碰，旋转物体
+        if(event.targetTouches.length==1){
+          var canvasWidth = event.targetTouches[0].target.width;
+          var canvasHeight = event.targetTouches[0].target.height;
+          var deltaAngleX = (event.targetTouches[0].pageX - mouseX)/canvasWidth;
+          var deltaAngleY = (event.targetTouches[0].pageY - mouseY)/canvasHeight;
+          //更新mouseX，mouseY参数
+          mouseX = event.targetTouches[0].pageX;
+          mouseY = event.targetTouches[0].pageY;
+          rotateModels(mesh1, model1StartRotation, deltaAngleX, deltaAngleY, 0.2);
+        }
+        //两个手指触碰，缩放物体
+        else{
+
+        }
+
+      };
+
+      var touchend = function(event){
+        touchDown = false;
+      }
+      renderer.domElement.addEventListener("touchstart",touchstart);
+      renderer.domElement.addEventListener("touchmove",touchmove);
+      renderer.domElement.addEventListener("touchend",touchend);
+    </script>
+  </body>
+</html>

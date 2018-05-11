@@ -4,6 +4,7 @@
     <title>threejs-hologram</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="stylesheet" href="css/main.css"/>
   </head>
   <body  ontouchmove="event.preventDefault();">
@@ -45,6 +46,7 @@
       document.getElementsByClassName("right")[0].style.top=heightValue;
       document.getElementsByClassName("left")[0].style.top=heightValue;
       document.getElementsByClassName("bottom")[0].style.top=parseFloat(heightValue) * 2 + 'px';
+      document.getElementsByClassName("container")[0].style.height=parseFloat(heightValue) * 3 + 'px';
     </script>
     <script>
       //初始化四个场景
@@ -71,7 +73,7 @@
       document.getElementsByClassName("right")[0].appendChild(renderer4.domElement);
       //定义控制器
       var control = new THREE.OrbitControls(camera);
-      control.enableZoom = false;
+      //control.enableZoom = false;
       control.enablePan = false;
       //设置摄像机位置
       var cameraZ=180;

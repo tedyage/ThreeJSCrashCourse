@@ -8,10 +8,11 @@ canvas{
   height:100%;
 }
 .container{
-  position: relative;
-  width: 100%;
-  margin: 40% auto;
-  background-color: #000;
+  position: absolute;
+  width: 70%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 .top,.left,.right,.bottom{
   position: absolute;
@@ -27,6 +28,5 @@ canvas{
 @media screen and (min-width:767px) {
   .container{
     width: 50%;
-    margin:0 auto;
   }
 }
