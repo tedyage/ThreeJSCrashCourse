@@ -35,7 +35,7 @@
         camera.updateProjectionMatrix();
       });
 
-      camera.position.set(0,0,200);
+      camera.position.set(0,0,300);
       camera.lookAt(0,0,0);
 
       var ambientLight = new THREE.AmbientLight(0xffffff,0.2)
@@ -79,7 +79,7 @@
       load("asset/source/threejs_marscloud.fbx",function(object){
         object.position.set(0,0,0);
         object.receiveShadow = true;
-        scene.add(object);
+        //scene.add(object);
         mesh2 = object;
       },function(xhr){
         console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
@@ -88,23 +88,75 @@
       });
 
       //update game parameters
-      var lightRotateSpeed = 0.005,cloudRotateSpeed = -0.009,planetRotateSpeed = -0.007;
+      var lightRotateSpeed = 0.005,          //光源转速
+          cloudRotateSpeed = -0.009,         //云层转速
+          planetRotateSpeed = -0.007,        //行星转速
+          resetRotateSpeed = 0.005;          //轨道恢复速度
+          resetScaleSpeed = 0.005;           //大小恢复速度
       var lightRotateAngle = 0;
       var update = function(){
         if(!touchDown){
-          lightRotateAngle+=lightRotateSpeed;
-          directionLight1.position.x = 500*Math.cos(Math.PI/2+lightRotateAngle);
-          directionLight1.position.z = 500*Math.sin(Math.PI/2+lightRotateAngle);
-          directionLight2.position.x = 500*Math.cos(-Math.PI/2+lightRotateAngle);
-          directionLight2.position.z = 500*Math.sin(-Math.PI/2+lightRotateAngle);
+          //lightRotateAngle+=lightRotateSpeed;
+          //directionLight1.position.x = 500*Math.cos(Math.PI/2+lightRotateAngle);
+          //directionLight1.position.z = 500*Math.sin(Math.PI/2+lightRotateAngle);
+          //directionLight2.position.x = 500*Math.cos(-Math.PI/2+lightRotateAngle);
+          //directionLight2.position.z = 500*Math.sin(-Math.PI/2+lightRotateAngle);
 
           if(mesh1===undefined)
             return;
-          //mesh1.rotateY(planetRotateSpeed);
+          //保持物体的自转是仅仅围绕Y轴。
+          if(mesh1.rotation.x > 0){
+            mesh1.rotation.x -= Math.abs(resetRotateSpeed);
+            if(mesh1.rotation.x < 0)
+              mesh1.rotation.x = 0;
+              mesh1.rotation.y += planetRotateSpeed;
+          }
+          else if(mesh1.rotation.x < 0){
+            mesh1.rotation.x += Math.abs(resetRotateSpeed);
+            if(mesh1.rotation.x > 0)
+              mesh1.rotation.x = 0;
+              mesh1.rotation.y += planetRotateSpeed;
+          }else{
+            mesh1.rotation.y += planetRotateSpeed;
+          }
+
+          if(mesh1.scale.x > 1){
+            mesh1.scale.x -= resetScaleSpeed;
+            mesh1.scale.y -= resetScaleSpeed;
+            mesh1.scale.z -= resetScaleSpeed;
+            if(mesh1.scale.x <= 1){
+              mesh1.scale.x = 1;
+              mesh1.scale.y = 1;
+              mesh1.scale.z = 1;
+            }
+          }
+          else if (mesh1.scale.x < 1){
+            mesh1.scale.x += resetScaleSpeed;
+            mesh1.scale.y += resetScaleSpeed;
+            mesh1.scale.z += resetScaleSpeed;
+            if(mesh1.scale.x >= 1){
+              mesh1.scale.x = 1;
+              mesh1.scale.y = 1;
+              mesh1.scale.z = 1;
+            }
+          }
 
           if(mesh2 === undefined)
             return;
-          mesh2.rotateY(cloudRotateSpeed)
+          if(mesh2.rotation.x > 0){
+            mesh2.rotation.x -= Math.abs(resetRotateSpeed);
+            if(mesh2.rotation.x < 0)
+              mesh2.rotation.x = 0;
+              mesh2.rotation.y += cloudRotateSpeed;
+          }
+          else if(mesh2.rotation.x < 0){
+            mesh2.rotation.x += Math.abs(resetRotateSpeed);
+            if(mesh2.rotation.x > 0)
+              mesh2.rotation.x = 0;
+              mesh2.rotation.y += cloudRotateSpeed;
+          }else{
+            mesh2.rotation.y += cloudRotateSpeed;
+          }
         }
       };
 
@@ -122,64 +174,139 @@
       GameLoop();
     </script>
     <script>
-      var mouseX=0, mouseY=0;
-      var model1StartRotation;
+      var touch1PositionX=0,                    //第一个触碰X坐标
+          touch1PositionY=0,                    //第一个触碰Y坐标
+          touch2PositionX=0,                    //第二个触碰X坐标
+          touch2PositionY=0,                    //第二个触碰Y坐标
+          touch1Distance=0;                     //两个触碰点间的距离
+      var model1Rotation,model2Rotation;
+      var model1Scale,model2Scale;
+      var timeout;
+
+      //旋转物体方法
       var rotateModels = function(model,startRotation,deltaAngleX,deltaAngleY,speed){
-        //var rotateSpeed = Math.abs(speed);
-        //model.rotateY(deltaX/(20000*rotateSpeed));
-        //model.rotateX(-deltaY/(20000*rotateSpeed));
-        model.rotation.x = startRotation.x + deltaAngleY/speed;
-        model.rotation.y = startRotation.y + deltaAngleX/speed;
+        //物体围绕x轴转动deltaAngleY/speed的角度
+        model.rotation.x = startRotation.x + deltaAngleX/speed;
+        //将物体的围绕X轴的转动角度限制在Math.PI/2和-Math.PI/2之间
+        if(model.rotation.x >= Math.PI/2){
+          model.rotation.x = Math.PI/2;
+        }else if(model.rotation.x <= -Math.PI/2){
+          model.rotation.x = -Math.PI/2;
+        }
+        //物体围绕y轴转动deltaAngleY/speed的角度
+        model.rotation.y = startRotation.y + deltaAngleY/speed;
+        //model1Rotation = model.rotation;
       };
 
+      //缩放物体方法
+      var scaleModels = function(model,deltaScale){
+        model.scale.x = deltaScale;
+        model.scale.y = deltaScale;
+        model.scale.z = deltaScale;
+        if(model.scale.x <= 1.0){
+          model.scale.x = 1.0;
+          model.scale.y = 1.0;
+          model.scale.z = 1.0;
+        }else if(model.scale.x >= 1.8){
+          model.scale.x = 1.8;
+          model.scale.y = 1.8;
+          model.scale.z = 1.8;
+        }
+      }
+
+      //触碰开始方法
       var touchstart = function(event){
         event.preventDefault();
-        touchDown = true;
+        //如果结束触碰后5秒之内，再次触碰，则清空倒计时
+        if(timeout>0)
+          clearTimeout(timeout);
+        touchDown = true;    //开始触碰
         var targetTouches = event.targetTouches;
         //排除无接触与三只手指以上接触的。
-        if(event.targetTouches === null|| event.targetTouches.length<=0||event.targetTouches.length>2)
+        if(targetTouches === null|| targetTouches.length<=0||targetTouches.length>2)
           return;
         //单手指触碰，旋转物体
-        if(event.targetTouches.length==1){
-          mouseX = event.targetTouches[0].pageX;
-          mouseY = event.targetTouches[0].pageY;
-          model1StartRotation = mesh1.rotation;
+        if(targetTouches.length==1){
+          //获取当前的触碰的位置x/y坐标
+          touch1PositionX = targetTouches[0].pageX;
+          touch1PositionY = targetTouches[0].pageY;
+          //获取当前的围绕x轴y轴的角度
+          model1Rotation = mesh1.rotation;
+          model2Rotation = mesh2.rotation;
         }
         //两个手指触碰，缩放物体
         else{
-
+          //获取当前的触碰的位置x/y坐标
+          touch1PositionX = targetTouches[0].pageX;
+          touch1PositionY = targetTouches[0].pageY;
+          touch2PositionX = targetTouches[1].pageX;
+          touch2PositionY = targetTouches[1].pageY;
+          //获取当前的两个触碰点之间的距离,以及当前的缩放比例
+          model1Scale = mesh1.scale.x;
+          touchDistance = Math.sqrt(Math.pow(touch2PositionX - touch1PositionX,2) + Math.pow(touch2PositionY - touch1PositionY,2));
         }
       };
 
+      //移动拖动手指
       var touchmove = function(event){
         event.preventDefault();
         //如果物体在运动中，则touchmove事件不作任何事情。
         if(!touchDown)
           return;
+        var targetTouches = event.targetTouches;
         //排除无接触与三只手指以上接触的。
-        if(event.targetTouches === null|| event.targetTouches.length<=0||event.targetTouches.length>2)
+        if(targetTouches === null || targetTouches.length<=0 || targetTouches.length>2)
           return;
         //单手指触碰，旋转物体
-        if(event.targetTouches.length==1){
-          var canvasWidth = event.targetTouches[0].target.width;
-          var canvasHeight = event.targetTouches[0].target.height;
-          var deltaAngleX = (event.targetTouches[0].pageX - mouseX)/canvasWidth;
-          var deltaAngleY = (event.targetTouches[0].pageY - mouseY)/canvasHeight;
-          //更新mouseX，mouseY参数
-          mouseX = event.targetTouches[0].pageX;
-          mouseY = event.targetTouches[0].pageY;
-          rotateModels(mesh1, model1StartRotation, deltaAngleX, deltaAngleY, 0.2);
+        if(targetTouches.length==1){
+          //计算画布的宽和高
+          var canvasWidth = targetTouches[0].target.width;
+          var canvasHeight = targetTouches[0].target.height;
+          //计算每次移动在x轴，y轴的角度差
+          var deltaAngleX = (targetTouches[0].pageY - touch1PositionY)/canvasHeight * Math.PI;
+          var deltaAngleY = (targetTouches[0].pageX - touch1PositionX)/canvasWidth * Math.PI;
+          //转动物体
+          rotateModels(mesh1, model1Rotation, deltaAngleX, deltaAngleY, 0.5);
+          //rotateModels(mesh2, model2Rotation, deltaAngleX, deltaAngleY, 0.5);
+          //重置触碰位置X/Y坐标，以备计算下次角度差
+          touch1PositionX = targetTouches[0].pageX;
+          touch1PositionY = targetTouches[0].pageY;
+          model1Rotation = mesh1.rotation;
+          model2Rotation = mesh2.rotation;
         }
         //两个手指触碰，缩放物体
         else{
-
+          //计算当前两个触碰点间的距离与缩放比
+          var currentDistance = Math.sqrt(Math.pow(targetTouches[0].pageX - targetTouches[1].pageX,2) + Math.pow(targetTouches[0].pageY - targetTouches[1].pageY,2));
+          var currentScale = currentDistance/touchDistance*model1Scale;
+          //缩放物体
+          scaleModels(mesh1,currentScale);
+          //scaleModel2(mesh2,currentScale);
+          //重置触碰点之间的距离与缩放比，以备下次计算
+          touchDistance = currentDistance;
+          model1Scale = currentScale;
+          touch1PositionX = targetTouches[0].pageX;
+          touch1PositionY = targetTouches[0].pageY;
         }
 
       };
 
+      //完成触碰，手指离开
       var touchend = function(event){
-        touchDown = false;
+
+        event.preventDefault();
+        var targetTouches = event.changedTouches;
+        //排除无接触与三只手指以上接触的。
+        if(targetTouches === null || targetTouches.length<=0 || targetTouches.length>2)
+          return;
+
+        //恢复touchDown = false
+        timeout = setTimeout(function () {
+          touchDown = false;
+        }, 3000);
+
       }
+
       renderer.domElement.addEventListener("touchstart",touchstart);
       renderer.domElement.addEventListener("touchmove",touchmove);
       renderer.domElement.addEventListener("touchend",touchend);
