@@ -58,6 +58,7 @@
       };
 
       renderer.setSize(window.innerWidth,window.innerHeight);
+      renderer.setViewport(window.innerWidth/2,0,window.innerWidth/2,window.innerHeight/2);
       //load the canvas
       document.body.appendChild(renderer.domElement);
 
@@ -93,8 +94,6 @@
       directionLight2.castShadow = true;
       directionLight2.mapSize = new THREE.Vector2(1024,1024);
       pivot2.add(directionLight2);
-      //scene.add(directionLight1)
-      //scene.add(directionLight2)
 
       //background-box
       var backgroundGeometry = new THREE.BoxGeometry(1000,1000,1000);
@@ -113,7 +112,7 @@
         scene.add(object);
         mesh1 = object;
       },function(xhr){
-        console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
+        //console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
       },function(error){
         alert(error);
       });
@@ -126,7 +125,7 @@
         scene.add(object);
         mesh2 = object;
       },function(xhr){
-        console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
+        //console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
       },function(error){
         alert(error);
       });
@@ -193,7 +192,6 @@
           planetRotateSpeed = -0.007,        //行星转速
           resetRotateSpeed = 0.01;          //轨道恢复速度
           resetScaleSpeed = 0.01;           //大小恢复速度
-      var lightRotateAngle = 0;
       var update = function(){
         if(!touchDown){
           //转动光源

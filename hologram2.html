@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hologram</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="stylesheet" href="css/main.css"/>
+  </head>
+  <body ontouchmove="event.preventDefault();">
+    <script src="js/three.min.js"></script>
+    <script src="js/framerate.js"></script>
+    <script src="js/inflate.min.js"></script>
+    <script src="js/FBXLoader.js"></script>
+    <script>
+    //初始化四个场景
+    var scene1 = new THREE.Scene();    //前方
+    var scene2 = new THREE.Scene();    //右方
+    var scene3 = new THREE.Scene();    //后方
+    var scene4 = new THREE.Scene();    //左方
+    //初始化一台摄像机
+    var camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+    //初始化四个渲染器
+    var renderer1 = new THREE.WebGLRenderer();
+    var renderer2 = new THREE.WebGLRenderer();
+    var renderer3 = new THREE.WebGLRenderer();
+    var renderer4 = new THREE.WebGLRenderer();
+    </script>
+  </body>
+</html>
