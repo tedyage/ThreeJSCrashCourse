@@ -3,6 +3,7 @@ var touch1PositionX=0,                    //第一个触碰X坐标
     touch2PositionX=0,                    //第二个触碰X坐标
     touch2PositionY=0,                    //第二个触碰Y坐标
     touchDistance=0;                     //两个触碰点间的距离
+    rotateScale=0.5;                            //转动倍数
 var timeout;
 
 //自转物体方法
@@ -28,12 +29,22 @@ var scaleModels = function(model,deltaScale){
     model.scale.x = 1.0;
     model.scale.y = 1.0;
     model.scale.z = 1.0;
-  }else if(model.scale.x >= 1.8){
-    model.scale.x = 1.8;
-    model.scale.y = 1.8;
-    model.scale.z = 1.8;
+  }else if(model.scale.x >= 1.5){
+    model.scale.x = 1.5;
+    model.scale.y = 1.5;
+    model.scale.z = 1.5;
   }
 }
+
+//在屏幕上输出参数
+var showParameters = function(str,val){
+  var res = str+" : "+val;
+  var span = document.createElement("span");
+  span.innerHTML=res;
+  var info = document.getElementById("info");
+  info.innerHTML="";
+  info.append(span);
+};
 
 //触碰开始方法
 var touchstart = function(event){
@@ -52,11 +63,13 @@ var touchstart = function(event){
     touch1PositionX = targetTouches[0].pageX;
     touch1PositionY = targetTouches[0].pageY;
     //获取当前的围绕x轴y轴的角度
-    for(var i = 0;i < 4;i++){
-      meshRotation[i] = mesh1.rotation;
-      cloudRotation[i] = cloud1.rotation;
-      lightBoxRotation[i] = lightBox1.rotation;
-    }
+    rotateTypeArr.forEach(function(temp,i){
+      if(temp===null||temp.length<=0)
+        return;
+      temp.forEach(function(rotate){
+        rotate = modelArr[i][0].rotation;
+      });
+    });
   }
   //两个手指触碰，缩放物体
   else{
@@ -67,10 +80,13 @@ var touchstart = function(event){
     touch2PositionY = targetTouches[1].pageY;
     touchDistance = Math.sqrt(Math.pow(touch2PositionX - touch1PositionX,2) + Math.pow(touch2PositionY - touch1PositionY,2));
     //获取当前的缩放比例
-    for(var i = 0; i < 4; i++){
-      meshScale[i] = mesh1.scale.x;
-      cloudScale[i] = cloud1.scale.x;
-    }
+    scaleTypeArr.forEach(function(temp,i){
+      if(temp===null||temp.length<=0)
+        return;
+      temp.forEach(function(scale){
+        scale = modelArr[i][0].scale.x;
+      });
+    });
   }
 };
 
@@ -93,49 +109,35 @@ var touchmove = function(event){
     var deltaAngleX = (targetTouches[0].pageY - touch1PositionY)/canvasHeight * Math.PI;
     var deltaAngleY = (targetTouches[0].pageX - touch1PositionX)/canvasWidth * Math.PI;
     //转动物体
-    rotateModels(mesh1, meshRotation[0], deltaAngleX, deltaAngleY, 0.5);
-    rotateModels(mesh2, meshRotation[1], deltaAngleX, deltaAngleY, 0.5);
-    rotateModels(mesh3, meshRotation[2], deltaAngleX, deltaAngleY, 0.5);
-    rotateModels(mesh4, meshRotation[3], deltaAngleX, deltaAngleY, 0.5);
-    rotateModels(cloud1, cloudRotation[0], deltaAngleX, deltaAngleY, 0.5);
-    rotateModels(cloud2, cloudRotation[1], deltaAngleX, deltaAngleY, 0.5);
-    rotateModels(cloud3, cloudRotation[2], deltaAngleX, deltaAngleY, 0.5);
-    rotateModels(cloud4, cloudRotation[3], deltaAngleX, deltaAngleY, 0.5);
-    rotateModels(lightBox1, lightBoxRotation[0], deltaAngleX, deltaAngleY, 0.5);
-    rotateModels(lightBox2, lightBoxRotation[1], deltaAngleX, deltaAngleY, 0.5);
-    rotateModels(lightBox3, lightBoxRotation[2], deltaAngleX, deltaAngleY, 0.5);
-    rotateModels(lightBox4, lightBoxRotation[3], deltaAngleX, deltaAngleY, 0.5);
+    modelArr.forEach(function(temp,i){
+      if(temp===null||temp.length<=0)
+        return;
+      temp.forEach(function(mesh,j){
+        rotateModels(mesh,rotateTypeArr[i][j],deltaAngleX,deltaAngleY,rotateScale);
+        rotateTypeArr[i][j] = mesh.rotation;
+      });
+    });
     //覆盖当前触碰位置X/Y坐标，以备计算下次角度差
     touch1PositionX = targetTouches[0].pageX;
     touch1PositionY = targetTouches[0].pageY;
-    //覆盖当前的物体角度变量，以备计算下次角度差
-    for(var i = 0;i < 4;i++){
-      meshRotation[i] = mesh1.rotation;
-      cloudRotation[i] = cloud1.rotation;
-      lightBoxRotation[i] = lightBox1.rotation;
-    }
   }
   //两个手指触碰，缩放物体
   else{
     //计算当前两个触碰点间的距离与缩放比
-    var currentDistance = Math.sqrt(Math.pow(targetTouches[0].pageX - targetTouches[1].pageX,2) + Math.pow(targetTouches[0].pageY - targetTouches[1].pageY,2));
-    var currentScale1 = currentDistance/touchDistance*meshScale[0];
-    var currentScale2 = currentDistance/touchDistance*cloudScale[0];
+    var currentDistance = Math.sqrt(Math.pow(targetTouches[0].pageX - targetTouches[1].pageX,2) +
+                          Math.pow(targetTouches[0].pageY - targetTouches[1].pageY,2));
     //缩放物体
-    scaleModels(mesh1,meshScale[0]);
-    scaleModels(mesh2,meshScale[1]);
-    scaleModels(mesh3,meshScale[2]);
-    scaleModels(mesh4,meshScale[3]);
-    scaleModels(cloud1,cloudScale[0]);
-    scaleModels(cloud2,cloudScale[1]);
-    scaleModels(cloud3,cloudScale[2]);
-    scaleModels(cloud4,cloudScale[3]);
-    //重置触碰点之间的距离与缩放比，以备下次计算
+    modelArr.forEach(function(temp,i){
+      if(temp===null||temp.length<=0)
+        return;
+      var currentScale = currentDistance/touchDistance*scaleTypeArr[i][0];
+      temp.forEach(function(mesh,j){
+        scaleModels(mesh,currentScale);
+        scaleTypeArr[i][j]=currentScale;
+      });
+    });
+    //重置触碰点的位置与之间的距离，以备下次计算
     touchDistance = currentDistance;
-    for(var i = 0; i < 4; i++){
-      meshScale[i] = mesh1.scale.x;
-      cloudScale[i] = cloud1.scale.x;
-    }
     touch1PositionX = targetTouches[0].pageX;
     touch1PositionY = targetTouches[0].pageY;
     touch2PositionX = targetTouches[1].pageX;
