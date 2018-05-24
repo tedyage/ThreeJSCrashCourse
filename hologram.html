@@ -13,17 +13,19 @@
     <script src="js/framerate.js"></script>
     <script src="js/inflate.min.js"></script>
     <script src="js/FBXLoader.js"></script>
+    <script src="node_modules/leapjs/leap-0.6.4.min.js"></script>
     <script>
       //摄像机z轴位置
       var cameraZ=280;
       //初始化物体转动角速度数据
-      var rotateSpeedArr=[-0.009,-0.007];
+      var rotateSpeedArr=[-0.009];
       //初始化物体文件名数组
-      var filenameArr=["asset/source/threejs_mars.fbx","asset/source/threejs_marscloud.fbx"];
+      var filenameArr=["asset/source/123.fbx"];
       var resetRotateSpeed = 0.01;          //轨道恢复速度
           resetScaleSpeed = 0.01;           //大小恢复速度
     </script>
-    <script src="js/hologram.js"></script>
     <script src="js/ModelTouchControls.js?v=1.1"></script>
+    <script src="js/LeapControls.js?v=1.0"></script>
+    <script src="js/hologram.js?v=1.0"></script>
   </body>
 </html>

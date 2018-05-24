@@ -2,6 +2,8 @@
 var width = 0, height = 0;
 //定义是否触摸到屏幕，默认是false
 var touchDown = false;
+//定义是否检测到手势，默认是false
+var isGestureProcessing = false;
 //声明四个场景
 var scene1,scene2,scene3,scene4;
 //声明一台摄像机
@@ -69,6 +71,7 @@ var initRenderer = function(){
   renderer4 = new THREE.WebGLRenderer();     //右方
 };
 
+//设置渲染器的位置
 var setRendererPosition = function(){
   //渲染器设置宽高,与绝对位置
   renderer1.setSize(width,height);
@@ -160,6 +163,7 @@ var loadModel = function(filename){
   var model = new Array(num);
   var fgxloader = new THREE.FBXLoader().
   load(filename,function(object){
+    console.log(object.toJSON());
     for(var i = 0; i< num; i++){
       var mesh = object.clone().rotateZ(Math.PI);
       mesh.receiveShadow = true;
@@ -189,7 +193,7 @@ var loadModel = function(filename){
   },function(xhr){
     //console.log("object "+(xhr.loaded/xhr.total*100)+"% loaded");
   },function(error){
-    alert(error);
+    console.log(error);
   });
 };
 
@@ -245,7 +249,7 @@ set();
 load();
 
 var update = function(){
-  if(touchDown)
+  if(touchDown||isGestureProcessing)
     return;
   if(modelArr.length<=0)
     return;
@@ -266,11 +270,28 @@ var render = function(){
   renderer3.render(scene3,camera.clone().translateZ(-cameraZ*2).rotateY(Math.PI).rotateZ(Math.PI));
   renderer4.render(scene4,camera.clone().translateX(cameraZ).translateZ(-cameraZ).rotateY(Math.PI/2).rotateZ(-Math.PI/2));
 };
+
 //定义循环执行函数
-var GameLoop = function(){
-  requestAnimationFrame(GameLoop);
-  update();
-  render();
+var loop = function(){
+  try{
+    Leap.loop(options,function(frame){
+      update();
+      render();
+    });
+  }
+  catch(e){
+    var GameLoop = function(){
+      requestAnimationFrame(GameLoop);
+      update();
+      render();
+    };
+
+    GameLoop();
+  }
 };
 
-GameLoop();
+loop();
+
+renderer1.domElement.addEventListener("touchstart",touchstart);
+renderer1.domElement.addEventListener("touchmove",touchmove);
+renderer1.domElement.addEventListener("touchend",touchend);

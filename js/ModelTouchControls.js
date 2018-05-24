@@ -163,7 +163,3 @@ var touchend = function(event){
     touchDown = false;
   }, 3000);
 }
-
-renderer1.domElement.addEventListener("touchstart",touchstart);
-renderer1.domElement.addEventListener("touchmove",touchmove);
-renderer1.domElement.addEventListener("touchend",touchend);
