@@ -163,7 +163,6 @@ var loadModel = function(filename){
   var model = new Array(num);
   var fgxloader = new THREE.FBXLoader().
   load(filename,function(object){
-    console.log(object.toJSON());
     for(var i = 0; i< num; i++){
       var mesh = object.clone().rotateZ(Math.PI);
       mesh.receiveShadow = true;

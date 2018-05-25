@@ -6,102 +6,111 @@
   </head>
   <body>
     <h1>Hello, LeapJS (V2)</h1>
-    <div id="output"></div>
+    <div id="output">
+      <script type="text/html" id="template">
+        <div>GestureID:{{gestureid}}</div>
+        <div>Gesture state:{{gestureState}}</div>
+        <div>Gesture startPosition:{{startPositionX}},{{startPositionY}},{{startPositionZ}}</div>
+        <div>Gesture position:{{positionX}},{{positionY}},{{positionZ}}</div>
+        <div>Gesture endPosition:{{endPositionX}},{{endPositionY}},{{endPositionZ}}</div>
+        <div>Gesture direction:{{direction}}</div>
+      </script>
+    </div>
     <script src="node_modules/leapjs/leap-0.6.4.min.js"></script>
+    <script src="node_modules/mustache/mustache.min.js"></script>
     <script>
-      function concatData(id, data){
-        return id+": "+data+"<br>";
-      }
-
-      function getFingerName(fingerType){
-        switch(fingerType){
-          case 0:
-            return "Thumb";
-          break;
-          case 1:
-            return "Index";
-          break;
-          case 2:
-            return "Middle";
-          break;
-          case 3:
-            return "Ring";
-          break;
-          case 4:
-            return "Pinky";
-          break;
-        }
-      }
-
-      function concatJointPosition(id, position){
-        return id+": "+position[0]+", "+position[1]+", "+position[2]+"<br>";
-      }
-
+      var swipeid = 0;                         //当前手势ID
       var output = document.getElementById("output");
-      var frameString = "",handString = "",fingerString="";
-      var hand,finger;
-
       var options = {enableGesures:true};
+      var processTime = null;
+      var timeout = 0;
+      var data={
+        gestureid:0,
+        gestureState:"",
+        startPositionX:0,
+        startPositionY:0,
+        startPositionZ:0,
+        positionX:0,
+        positionY:0,
+        positionZ:0,
+        endPositionX:0,
+        endPositionY:0,
+        endPositionZ:0,
+        direction:""
+      };
+
+      var resetData = function(){
+        data={
+          gestureid:0,
+          gestureState:"",
+          startPositionX:0,
+          startPositionY:0,
+          startPositionZ:0,
+          positionX:0,
+          positionY:0,
+          positionZ:0,
+          endPositionX:0,
+          endPositionY:0,
+          endPositionZ:0,
+          direction:""
+        };
+      }
+      var template = document.getElementById("template").innerHTML.trim();
+      Mustache.parse(template);
 
       var controller = new Leap.Controller(options);
-
       controller.connect();
+
+      controller.on('frame',function(frame){
+        output.innerHTML = Mustache.render(template,data);
+        var current = new Date();
+        if(processTime!==null){
+          var diff = Math.abs(current-processTime);
+          if(diff>5000&&frame.hands.length<=0){
+            resetData();
+          }
+        }
+      });
 
       var gestureString = "";
       controller.on('gesture',function(gesture,frame){
-        if(frame.valid&&frame.gestures.length>0){
-          frame.gestures.forEach(function(gesture){
-            if(gesture.type === "swipe"){
-              if(gesture.state === "start"){
-                gestureString = "Swipe start at x: "+gesture.startPosition[0]+" y: "+gesture.startPosition[1]+" z: "+gesture.startPosition[2]+"<br>";
-              }
-              else if (gesture.state === "update"){
-                //gestureString += "Swipe in progress at x: "+gesture.position[0]+" y: "+gesture.position[1]+" z: "+gesture.position[2]+"<br>";
-              }
-              else if(gesture.state ==="stop"){
-                gestureString += "Swipe stop at x: "+gesture.position[0]+" y: "+gesture.position[1]+" z: "+gesture.position[2]+"<br>";
-              }
-              else{
-                gestureString += "";
-              }
+        if(gesture.type === "swipe"){
+          if(timeout>0)
+            clearTimeout(timeout);
+          data.gestureState = gesture.state;
+          if(gesture.state === "start"){
+            isGestureProcessing = true;
+            processTime = new Date();
+            if(gesture.handIds.length==1){
+              data.gestureid=gesture.id;
+              data.startPositionX=gesture.startPosition[0];
+              data.startPositionY=gesture.startPosition[1];
+              data.startPositionZ=gesture.startPosition[2];
             }
-
-          });
-        }
-      });
-
-      Leap.loop(options,function(frame){
-        frameString = concatData("frame_id", frame.id);
-        frameString += concatData("num_hands",frame.hands.length);
-        frameString += concatData("num_fingers",frame.fingers.length);
-        frameString += "</br>";
-
-        for(var i =0, len = frame.hands.length; i< len;i++){
-          hand = frame.hands[i];
-          handString = concatData("hand_type",hand.type);
-          handString += concatData("confidence",hand.confidence);
-          handString += concatData("pinch_strength",hand.pinchStrength);
-          handString += concatData("grab_strength",hand.grabStrength);
-          handString += "</br>";
-
-          fingerString = "";
-          for(var j=0,len2 = hand.fingers.length;j<len2;j++){
-            finger = hand.fingers[j];
-            fingerString += concatData("finger_type",finger.type)+"("+getFingerName(finger.type)+")<br>";
-            fingerString += concatJointPosition("finger_dip",finger.dipPosition);
-            fingerString += concatJointPosition("finger_pip",finger.pipPosition);
-            fingerString += concatJointPosition("finger_mcp",finger.mcpPosition);
-            fingerString +="<br>";
           }
-
-          //frameString += handString;
-          //frameString += fingerString;
-          frameString += gestureString;
+          else if (gesture.state === "update"){
+            processTime = new Date();
+            if(gesture.handIds.length==1){
+              if(gesture.direction[0]>0){
+                data.direction = "right";
+              }else{
+                data.direction = "left";
+              }
+              data.positionX=gesture.position[0];
+              data.positionY=gesture.position[1];
+              data.positionZ=gesture.position[2];
+            }
+          }
+          else if(gesture.state ==="stop"){
+            isGestureProcessing = false;
+            if(gesture.handIds.length==1){
+              data.endPositionX=gesture.position[0];
+              data.endPositionY=gesture.position[1];
+              data.endPositionZ=gesture.position[2];
+            }
+          }
         }
-        output.innerHTML=frameString;
       });
-
-
     </script>
   </body>
 </html>

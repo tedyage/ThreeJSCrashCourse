@@ -8,19 +8,29 @@
     <link rel="stylesheet" href="css/main.css"/>
   </head>
   <body  ontouchmove="event.preventDefault();">
-    <div id="info"></div>
+    <div id="output" style="color:#fff;position:absolute;top:8%;">
+      <script type="text/html" id="template">
+        <div>GestureID:{{gestureid}}</div>
+        <div>Gesture state:{{gestureState}}</div>
+        <div>Gesture startPosition:{{startPositionX}},{{startPositionY}},{{startPositionZ}}</div>
+        <div>Gesture position:{{positionX}},{{positionY}},{{positionZ}}</div>
+        <div>Gesture endPosition:{{endPositionX}},{{endPositionY}},{{endPositionZ}}</div>
+        <div>Gesture direction:{{direction}}</div>
+      </script>
+    </div>
     <script src="js/three.min.js"></script>
     <script src="js/framerate.js"></script>
     <script src="js/inflate.min.js"></script>
     <script src="js/FBXLoader.js"></script>
     <script src="node_modules/leapjs/leap-0.6.4.min.js"></script>
+    <script src="node_modules/mustache/mustache.min.js"></script>
     <script>
       //摄像机z轴位置
-      var cameraZ=280;
+      var cameraZ=250;
       //初始化物体转动角速度数据
-      var rotateSpeedArr=[-0.009];
+      var rotateSpeedArr=[-0.009,-0.007];
       //初始化物体文件名数组
-      var filenameArr=["asset/source/123.fbx"];
+      var filenameArr=["asset/source/threejs_mars.fbx","asset/source/threejs_marscloud.fbx"];
       var resetRotateSpeed = 0.01;          //轨道恢复速度
           resetScaleSpeed = 0.01;           //大小恢复速度
     </script>

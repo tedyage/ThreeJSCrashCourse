@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <title>leap v2</title>
+    <meta charset="utf-8"/>
+    <meta name='viewport' content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  </head>
+  <body>
+    <h1>Hello, LeapJS (V2)</h1>
+    <div id="counters">If you have an attached LeapMotion then counters should be appearing here</div>
+    <script src="node_modules/leapjs/leap-0.6.4.min.js"></script>
+    <script>
+      var debug = 0;
+      var numSwipes=0;        // total count of swipes seen
+      var numSwipesLeft=0;
+      var numSwipesRight=0;
+      var numTaps=0;
+
+      var controller = new Leap.Controller({enableGestures: true});
+      controller.connect();
+
+      controller.on('gesture', function (gesture) {
+        if (gesture.type == 'swipe') {
+    	     handleSwipe(gesture);
+         }
+
+       });
+
+       function handleSwipe(swipe) {
+  	      if (swipe.state == 'stop') {
+  		        if (debug>0) console.log("found a swipe, " + numSwipes);
+  		          numSwipes++;
+
+  		// the swipe object will tell us which direction the swipe was in
+  		  if (swipe.direction[0] > 0) {
+  			     numSwipesRight++;
+  		       } else {
+  			          numSwipesLeft++;
+  		            }
+  	             }
+
+  	// update the webpage with out current count data
+  	 refreshCounts();
+   }
+
+   function refreshCounts() {
+    var element=document.getElementById("counters");
+    element.innerHTML="numSwipes " + numSwipes + ", left " + numSwipesLeft + ", right " + numSwipesRight + ", taps " + numTaps;
+}
+    </script>
+  </body>
+</html>
