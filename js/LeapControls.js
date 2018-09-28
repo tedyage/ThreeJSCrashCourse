@@ -21,6 +21,8 @@ var isHandComplete = true;
 var hand,fingers;
 //页面output的所需要参数
 var data;
+//初始缩放命令为放大
+var action = "bigger";
 
 var resetData = function(){
   data={
@@ -33,15 +35,14 @@ var resetData = function(){
     left_hand_grab_strength:0,
     left_hand_palmPositionX:0,
     left_hand_palmPositionY:0,
-    left_hand_palmPositionZ:0,
-    left_hand_IsPinched:false,
+    left_hand_palmPositionZ:0,    
     right_hand_confidence:0,
     right_hand_pinch_strength:0,
     right_hand_grab_strength:0,
     right_hand_palmPositionX:0,
     right_hand_palmPositionY:0,
     right_hand_palmPositionZ:0,
-    right_hand_IsPinched:false,
+    action:action
   };
 };
 
@@ -124,48 +125,29 @@ var handsDetectedFunction = function(frame){
           hand1PositionY = hand.palmPosition[1];
         }
         else{
-          //获取拇指与食指
-          fingers = [hand.fingers[0],hand.fingers[1]];
-          //如果isPinched为false，则是开始捏住
-          if(!isPinched){
-            isPinched=!isPinched;
-            //初始化拇指与食指指尖的坐标值
-            thumbTipPositionX = fingers[0].dipPosition[0];
-            thumbTipPositionY = fingers[0].dipPosition[1];
-            thumbTipPositionZ = fingers[0].dipPosition[2];
-            indexTipPositionX = fingers[1].dipPosition[0];
-            indexTipPositionY = fingers[1].dipPosition[1];
-            indexTipPositionZ = fingers[1].dipPosition[2];
-            fingerTipDistance = Math.sqrt(Math.pow(indexTipPositionX - thumbTipPositionX,2) 
-              + Math.pow(indexTipPositionY - thumbTipPositionY,2)); 
-            //获取当前的缩放比例
-            for(var i = 0;i < scaleTypeArr.length; i++){
-              for(var j = 0;j < scaleTypeArr[i].length; j++){
-                scaleTypeArr[i][j] = modelArr[i][0].scale.x;
-              }
-            }
+          //判断是否是要放大，bigger代表要放大；smaller代表自动缩小
+          action = modelArr[0][0].scale.x<=1.5?"bigger":"smaller";          
+          data.action = action;
+          if(action==="bigger"){
+            //锁住平移逻辑
+            isPinched = true;
+            if(hand.pinchStrength!==1){   
+              //开始放大         
+              modelArr.forEach(function(temp,i){
+                if(temp===null||temp.length<=0)
+                  return;
+                temp.forEach(function(mesh,j){
+                  mesh.scale.x+=0.01;
+                  mesh.scale.y+=0.01;
+                  mesh.scale.z+=0.01;
+                });
+              });    
+            }                  
           }else{
-            //如果isPinched为true，则是手指正在缩放
-            //计算当前两个手指指尖的距离与缩放比
-            var currentDistance = Math.sqrt(Math.pow(fingers[1].dipPosition[0] - fingers[0].dipPosition[0],2) +
-                          Math.pow(fingers[1].dipPosition[1] - fingers[0].dipPosition[1],2));
-            //缩放物体
-            modelArr.forEach(function(temp,i){
-              if(temp===null||temp.length<=0)
-                return;
-              var currentScale = currentDistance/fingerTipDistance*scaleTypeArr[i][0];
-              temp.forEach(function(mesh,j){
-                scaleModels(mesh,currentScale);
-                scaleTypeArr[i][j]=currentScale;
-              });
-            });
-            //重置触碰点的位置与之间的距离，以备下次计算
-            fingerTipDistance = currentDistance;
-            thumbTipPositionX = fingers[0].dipPosition[0];
-            thumbTipPositionY = fingers[0].dipPosition[1];
-            indexTipPositionX = fingers[1].dipPosition[0];
-            indexTipPositionY = fingers[1].dipPosition[1];
-          }
+            //完成发达，接触评议逻辑锁定
+            isPinched = false;
+            return;
+          }          
         }        
       }      
     }
@@ -177,8 +159,7 @@ var handsDetectedFunction = function(frame){
         data.left_hand_grab_strength = leftHand.grabStrength;
         data.left_hand_palmPositionX = leftHand.palmPosition[0];
         data.left_hand_palmPositionY = leftHand.palmPosition[1];
-        data.left_hand_palmPositionZ = leftHand.palmPosition[2];
-        data.left_hand_IsPinched = isPinched;
+        data.left_hand_palmPositionZ = leftHand.palmPosition[2];       
       }else if(hand.type==="right"){
         rightHand = hand;
         data.right_hand_confidence = rightHand.confidence;
@@ -187,14 +168,13 @@ var handsDetectedFunction = function(frame){
         data.right_hand_palmPositionX = rightHand.palmPosition[0];
         data.right_hand_palmPositionY = rightHand.palmPosition[1];
         data.right_hand_palmPositionZ = rightHand.palmPosition[2];
-        data.right_hand_IsPinched = isPinched;
       }
     });
     data.frame_id = frame.id;
     data.hands_detected = isHandDetected;
     data.hands_complete = isHandComplete;
     data.num_hands = frame.hands.length;
-
+    
   }else{
     if(isHandDetected){
       isHandDetected=!isHandDetected;
