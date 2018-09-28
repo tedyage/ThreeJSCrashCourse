@@ -8,14 +8,30 @@
     <link rel="stylesheet" href="css/main.css"/>
   </head>
   <body  ontouchmove="event.preventDefault();">
-    <div id="output" style="color:#fff;position:absolute;top:8%;">
+    <div id="output" style="color:#fff;position:absolute;top:8%;z-index:99">
       <script type="text/html" id="template">
-        <div>GestureID:{{gestureid}}</div>
-        <div>Gesture state:{{gestureState}}</div>
-        <div>Gesture startPosition:{{startPositionX}},{{startPositionY}},{{startPositionZ}}</div>
-        <div>Gesture position:{{positionX}},{{positionY}},{{positionZ}}</div>
-        <div>Gesture endPosition:{{endPositionX}},{{endPositionY}},{{endPositionZ}}</div>
-        <div>Gesture direction:{{direction}}</div>
+        <div>frame_id: {{frame_id}}</div>
+        <div>hands_detected: {{hands_detected}}</div>
+        <div>hands_complete: {{hands_complete}}</div>
+        <div>num_hands: {{num_hands}}</div>
+        <div>Left_Hand
+          <ul>
+            <li>confidence: {{left_hand_confidence}}</li>
+            <li>pinch_strength: {{left_hand_pinch_strength}}</li>
+            <li>grab_strength: {{left_hand_grab_strength}}</li>
+            <li>palm_position: [{{left_hand_palmPositionX}},{{left_hand_palmPositionY}},{{left_hand_palmPositionZ}}]</li>
+            <li>isPinched: {{left_hand_IsPinched}}</li>
+          </ul>
+        </div>
+        <div>Right_Hand
+          <ul>
+            <li>confidence: {{right_hand_confidence}}</li>
+            <li>pinch_strength: {{right_hand_pinch_strength}}</li>
+            <li>grab_strength: {{right_hand_grab_strength}}</li>
+            <li>palm_position: [{{right_hand_palmPositionX}},{{right_hand_palmPositionY}},{{right_hand_palmPositionZ}}]</li>
+            <li>isPinched: {{right_hand_IsPinched}}</li>
+          </ul>
+        </div>
       </script>
     </div>
     <script src="js/three.min.js"></script>
@@ -34,8 +50,8 @@
       var resetRotateSpeed = 0.01;          //轨道恢复速度
           resetScaleSpeed = 0.01;           //大小恢复速度
     </script>
-    <script src="js/ModelTouchControls.js?v=1.1"></script>
+    <!--<script src="js/ModelTouchControls.js?v=1.2"></script>-->
     <script src="js/LeapControls.js?v=1.0"></script>
-    <script src="js/hologram.js?v=1.0"></script>
+    <script src="js/hologram.js?v=1.2"></script>
   </body>
 </html>

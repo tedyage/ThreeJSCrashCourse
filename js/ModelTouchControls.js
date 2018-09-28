@@ -63,13 +63,11 @@ var touchstart = function(event){
     touch1PositionX = targetTouches[0].pageX;
     touch1PositionY = targetTouches[0].pageY;
     //获取当前的围绕x轴y轴的角度
-    rotateTypeArr.forEach(function(temp,i){
-      if(temp===null||temp.length<=0)
-        return;
-      temp.forEach(function(rotate){
-        rotate = modelArr[i][0].rotation;
-      });
-    });
+    for(var i = 0; i < rotateTypeArr.length; i++){
+      for(var j = 0; j < rotateTypeArr[i].length; j++){
+        rotateTypeArr[i][j] = modelArr[i][0].rotation;
+      }
+    }
   }
   //两个手指触碰，缩放物体
   else{
@@ -78,15 +76,13 @@ var touchstart = function(event){
     touch1PositionY = targetTouches[0].pageY;
     touch2PositionX = targetTouches[1].pageX;
     touch2PositionY = targetTouches[1].pageY;
-    touchDistance = Math.sqrt(Math.pow(touch2PositionX - touch1PositionX,2) + Math.pow(touch2PositionY - touch1PositionY,2));
+    touchDistance = Math.sqrt(Math.pow(touch2PositionX - touch1PositionX,2) + Math.pow(touch2PositionY - touch1PositionY,2));    
     //获取当前的缩放比例
-    scaleTypeArr.forEach(function(temp,i){
-      if(temp===null||temp.length<=0)
-        return;
-      temp.forEach(function(scale){
-        scale = modelArr[i][0].scale.x;
-      });
-    });
+    for(var i = 0;i < scaleTypeArr.length; i++){
+      for(var j = 0;j < scaleTypeArr[i].length; j++){
+        scaleTypeArr[i][j] = modelArr[i][0].scale.x;
+      }
+    }
   }
 };
 
@@ -163,3 +159,7 @@ var touchend = function(event){
     touchDown = false;
   }, 3000);
 }
+
+renderer1.domElement.addEventListener("touchstart",touchstart);
+renderer1.domElement.addEventListener("touchmove",touchmove);
+renderer1.domElement.addEventListener("touchend",touchend);

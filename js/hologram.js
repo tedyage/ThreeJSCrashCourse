@@ -2,8 +2,10 @@
 var width = 0, height = 0;
 //定义是否触摸到屏幕，默认是false
 var touchDown = false;
-//定义是否检测到手势，默认是false
-var isGestureProcessing = false;
+//定义是否监测到手，默认是false
+var isHandDetected = false;
+//定义是否完成手部指令
+var isHandComplete = true;
 //声明四个场景
 var scene1,scene2,scene3,scene4;
 //声明一台摄像机
@@ -16,12 +18,19 @@ var modelArr=[];
 var rotateTypeArr=[],scaleTypeArr=[];
 //定义全息棱镜变的数量，初始为4
 var num = 4;
+//页面output的所需要参数
+var template;
+//倒计时
+var timeout;
 //初始化
 var init = function(){
   initWidthAndHeight();
   initScene();
   initCamera();
   initRenderer();
+
+  template = document.getElementById("template").innerHTML.trim();
+  Mustache.parse(template);
 };
 
 //设置
@@ -246,24 +255,26 @@ var ModelScale = function(mesh,resetScaleSpeed){
 init();
 set();
 load();
+resetData();
 
 var update = function(){
-  if(touchDown||isGestureProcessing)
+  if(touchDown||!isHandComplete)
     return;
   if(modelArr.length<=0)
     return;
   modelArr.forEach(function(temp,index){
     if(temp===null||temp.length<=0)
       return;
-      temp.forEach(function(mesh){
+      temp.forEach(function(mesh,j){
         ModelRotate(mesh,rotateSpeedArr[index],resetRotateSpeed);   //转动模型
-        ModelScale(mesh,resetScaleSpeed);                           //缩放模型
+        ModelScale(mesh,resetScaleSpeed);                           //缩放模型        
       });
   });
 };
 
 //定义渲染函数，
 var render = function(){
+  output.innerHTML = Mustache.render(template,data);
   renderer1.render(scene1,camera.clone());
   renderer2.render(scene2,camera.clone().translateX(-cameraZ).translateZ(-cameraZ).rotateY(-Math.PI/2).rotateZ(Math.PI/2));
   renderer3.render(scene3,camera.clone().translateZ(-cameraZ*2).rotateY(Math.PI).rotateZ(Math.PI));
@@ -276,21 +287,20 @@ var loop = function(){
     Leap.loop(options,function(frame){
       update();
       render();
+      handsDetectedFunction(frame);
     });
+    //var GameLoop = function(){
+    //  requestAnimationFrame(GameLoop);
+    //  update();
+    //  render();
+    //};
+    //GameLoop();
   }
   catch(e){
-    var GameLoop = function(){
-      requestAnimationFrame(GameLoop);
-      update();
-      render();
-    };
-
-    GameLoop();
+    throw e;
   }
 };
 
 loop();
 
-renderer1.domElement.addEventListener("touchstart",touchstart);
-renderer1.domElement.addEventListener("touchmove",touchmove);
-renderer1.domElement.addEventListener("touchend",touchend);
+
