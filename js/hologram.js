@@ -255,7 +255,7 @@ var ModelScale = function(mesh,resetScaleSpeed){
 init();
 set();
 load();
-resetData();
+//resetData();
 
 var update = function(){
   if(touchDown||!isHandComplete)
@@ -274,7 +274,7 @@ var update = function(){
 
 //定义渲染函数，
 var render = function(){
-  output.innerHTML = Mustache.render(template,data);
+  //output.innerHTML = Mustache.render(template,data);
   renderer1.render(scene1,camera.clone());
   renderer2.render(scene2,camera.clone().translateX(-cameraZ).translateZ(-cameraZ).rotateY(-Math.PI/2).rotateZ(Math.PI/2));
   renderer3.render(scene3,camera.clone().translateZ(-cameraZ*2).rotateY(Math.PI).rotateZ(Math.PI));

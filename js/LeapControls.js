@@ -1,5 +1,5 @@
 var options = {enableGesures:true};      //定义options,允许使用手势控制
-var output = document.getElementById("output");
+//var output = document.getElementById("output");
 var processTime = null;
 var hand1PositionX=0,                    //第一个感应手X坐标
     hand1PositionY=0,                    //第一个感应手Y坐标
@@ -24,27 +24,27 @@ var data;
 //初始缩放命令为放大
 var action = "bigger";
 
-var resetData = function(){
-  data={
-    frame_id:0,
-    hands_detected:isHandDetected,
-    hands_complete:isHandComplete,
-    num_hands:0,
-    left_hand_confidence:0,
-    left_hand_pinch_strength:0,
-    left_hand_grab_strength:0,
-    left_hand_palmPositionX:0,
-    left_hand_palmPositionY:0,
-    left_hand_palmPositionZ:0,    
-    right_hand_confidence:0,
-    right_hand_pinch_strength:0,
-    right_hand_grab_strength:0,
-    right_hand_palmPositionX:0,
-    right_hand_palmPositionY:0,
-    right_hand_palmPositionZ:0,
-    action:action
-  };
-};
+//var resetData = function(){
+//  data={
+//    frame_id:0,
+//    hands_detected:isHandDetected,
+//    hands_complete:isHandComplete,
+//    num_hands:0,
+//    left_hand_confidence:0,
+//    left_hand_pinch_strength:0,
+//    left_hand_grab_strength:0,
+//    left_hand_palmPositionX:0,
+//    left_hand_palmPositionY:0,
+//    left_hand_palmPositionZ:0,    
+//    right_hand_confidence:0,
+//    right_hand_pinch_strength:0,
+//    right_hand_grab_strength:0,
+//    right_hand_palmPositionX:0,
+//    right_hand_palmPositionY:0,
+//    right_hand_palmPositionZ:0,
+//    action:action
+//  };
+//};
 
 
 
@@ -127,7 +127,7 @@ var handsDetectedFunction = function(frame){
         else{
           //判断是否是要放大，bigger代表要放大；smaller代表自动缩小
           action = modelArr[0][0].scale.x<=1.5?"bigger":"smaller";          
-          data.action = action;
+          //data.action = action;
           if(action==="bigger"){
             //锁住平移逻辑
             isPinched = true;
@@ -151,29 +151,29 @@ var handsDetectedFunction = function(frame){
         }        
       }      
     }
-    frame.hands.forEach(function(hand){
-      if(hand.type==="left"){
-        leftHand = hand;
-        data.left_hand_confidence = leftHand.confidence;
-        data.left_hand_pinch_strength = leftHand.pinchStrength;
-        data.left_hand_grab_strength = leftHand.grabStrength;
-        data.left_hand_palmPositionX = leftHand.palmPosition[0];
-        data.left_hand_palmPositionY = leftHand.palmPosition[1];
-        data.left_hand_palmPositionZ = leftHand.palmPosition[2];       
-      }else if(hand.type==="right"){
-        rightHand = hand;
-        data.right_hand_confidence = rightHand.confidence;
-        data.right_hand_pinch_strength = rightHand.pinchStrength;
-        data.right_hand_grab_strength = rightHand.grabStrength;
-        data.right_hand_palmPositionX = rightHand.palmPosition[0];
-        data.right_hand_palmPositionY = rightHand.palmPosition[1];
-        data.right_hand_palmPositionZ = rightHand.palmPosition[2];
-      }
-    });
-    data.frame_id = frame.id;
-    data.hands_detected = isHandDetected;
-    data.hands_complete = isHandComplete;
-    data.num_hands = frame.hands.length;
+    //frame.hands.forEach(function(hand){
+    //  if(hand.type==="left"){
+    //    leftHand = hand;
+    //    data.left_hand_confidence = leftHand.confidence;
+    //    data.left_hand_pinch_strength = leftHand.pinchStrength;
+    //    data.left_hand_grab_strength = leftHand.grabStrength;
+    //    data.left_hand_palmPositionX = leftHand.palmPosition[0];
+    //    data.left_hand_palmPositionY = leftHand.palmPosition[1];
+    //    data.left_hand_palmPositionZ = leftHand.palmPosition[2];       
+    //  }else if(hand.type==="right"){
+    //    rightHand = hand;
+    //    data.right_hand_confidence = rightHand.confidence;
+    //    data.right_hand_pinch_strength = rightHand.pinchStrength;
+    //    data.right_hand_grab_strength = rightHand.grabStrength;
+    //    data.right_hand_palmPositionX = rightHand.palmPosition[0];
+    //    data.right_hand_palmPositionY = rightHand.palmPosition[1];
+    //    data.right_hand_palmPositionZ = rightHand.palmPosition[2];
+    //  }
+    //});
+    //data.frame_id = frame.id;
+    //data.hands_detected = isHandDetected;
+    //data.hands_complete = isHandComplete;
+    //data.num_hands = frame.hands.length;
     
   }else{
     if(isHandDetected){
@@ -182,7 +182,7 @@ var handsDetectedFunction = function(frame){
         isPinched = !isPinched;
       timeout = setTimeout(function() {
         isHandComplete = true;
-        resetData();
+        //resetData();
       }, 3000);
     }
   }  
