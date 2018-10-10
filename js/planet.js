@@ -49,29 +49,29 @@ var set = function(){
 //设置光照
 var setLights = function(){
 	//定义光照
-  	var ambientLight = new THREE.AmbientLight(0xffffff,0.5);
-  	scene.add(ambientLight);
-  	//定义日光和月光
-  	var lightBox = new THREE.Object3D();
-  	var pivot1 = new THREE.Object3D();
-  	var pivot2 = new THREE.Object3D();
- 	pivot1.rotation.y = -3*Math.PI/4;
-  	pivot2.rotation.y = Math.PI/4;
-  	lightBox.add(pivot1);
+	var ambientLight = new THREE.AmbientLight(0xffffff,0.5);
+	scene.add(ambientLight);
+	//定义日光和月光
+	var lightBox = new THREE.Object3D();
+	var pivot1 = new THREE.Object3D();
+	var pivot2 = new THREE.Object3D();
+	pivot1.rotation.y = -3*Math.PI/4;
+	pivot2.rotation.y = Math.PI/4;
+	lightBox.add(pivot1);
 	lightBox.add(pivot2)
 	//sun light
-  	var directionLight1 = new THREE.DirectionalLight(0xffffff,0.8);
-  	directionLight1.position.set(500,0,0);
-  	directionLight1.castShadow = true;
-  	directionLight1.mapSize = new THREE.Vector2(1024,1024);
-  	pivot1.add(directionLight1);
-  	//moon light
-  	var directionLight2 = new THREE.DirectionalLight(0x59888C,0.3);
-  	directionLight2.position.set(500,0,0);
-  	directionLight2.castShadow = true;
-  	directionLight2.mapSize = new THREE.Vector2(1024,1024);
-  	pivot2.add(directionLight2);
-  	scene.add(lightBox);
+	var directionLight1 = new THREE.DirectionalLight(0xffffff,0.8);
+	directionLight1.position.set(500,0,0);
+	directionLight1.castShadow = true;
+	directionLight1.mapSize = new THREE.Vector2(1024,1024);
+	pivot1.add(directionLight1);
+	//moon light
+	var directionLight2 = new THREE.DirectionalLight(0x59888C,0.3);
+	directionLight2.position.set(500,0,0);
+	directionLight2.castShadow = true;
+	directionLight2.mapSize = new THREE.Vector2(1024,1024);
+	pivot2.add(directionLight2);
+	scene.add(lightBox);
 }
 //设置摄像机
 var setCamera = function(){
@@ -113,6 +113,8 @@ var loadModel = function(filename){
 init();
 set();
 load();
+resetData();
+
 
 //转动物体方法
 var ModelRotate = function(mesh,resetRotateSpeed,modelRotateSpeed){
@@ -170,10 +172,10 @@ var update = function(){
   modelArr.forEach(function(temp,index){
     if(temp===null||temp.length<=0)
       return;
-      temp.forEach(function(mesh,j){
-        ModelRotate(mesh,rotateSpeedArr[index],resetRotateSpeed);   //转动模型
-        ModelScale(mesh,resetScaleSpeed);                           //缩放模型        
-      });
+    temp.forEach(function(mesh,j){
+      ModelRotate(mesh,rotateSpeedArr[index],resetRotateSpeed);   //转动模型
+      ModelScale(mesh,resetScaleSpeed);                           //缩放模型        
+    });
   });
 };
 //每一帧的渲染方法
@@ -186,8 +188,10 @@ var loop = function(){
     Leap.loop(options,function(frame){
       update();
       render();
-      handsDetectedFunction(frame);
-    });
+      LeftHandDetectedFunction(frame);
+      RightHandDetectedFunction(frame);
+      outputData(data);
+    }).use('screenPosition',{scale:0.25});
     //var GameLoop = function(){
     //  requestAnimationFrame(GameLoop);
     //  update();

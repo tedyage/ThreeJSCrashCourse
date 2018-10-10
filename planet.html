@@ -8,22 +8,26 @@
     <link rel="stylesheet" href="css/main.css"/>
 </head>
 <body ontouchmove="event.preventDefault();">
+  <div id="output" style="color:#fff;position:absolute;top:8%;z-index:99">
+    <div></div>
+  </div>
 	<script src="js/three.min.js"></script>
-    <script src="js/framerate.js"></script>
-    <script src="js/inflate.min.js"></script>
-    <script src="js/FBXLoader.js"></script>
-    <script src="node_modules/leapjs/leap-0.6.4.min.js"></script>
-    <script>
-      //摄像机z轴位置
-      var cameraZ=250;
-      //初始化物体转动角速度数据
-      var rotateSpeedArr=[-0.009,-0.007];
-      //初始化物体文件名数组
-      var filenameArr=["asset/source/threejs_mars.fbx","asset/source/threejs_marscloud.fbx"];
-      var resetRotateSpeed = 0.01;          //轨道恢复速度
-          resetScaleSpeed = 0.01;           //大小恢复速度
-    </script>    
-    <script src="js/LeapControls.js?v=1.0"></script>
-    <script src="js/planet.js"></script>
+  <script src="js/framerate.js"></script>
+  <script src="js/inflate.min.js"></script>
+  <script src="js/FBXLoader.js"></script>
+  <script src="node_modules/leapjs/leap-0.6.4.min.js"></script>
+  <script src="js/leap-plugins-0.1.12.min.js"></script>
+  <script>
+    //摄像机z轴位置
+    var cameraZ=250;
+    //初始化物体转动角速度数据
+    var rotateSpeedArr=[-0.009,-0.007];
+    //初始化物体文件名数组
+    var filenameArr=["asset/source/threejs_mars.fbx","asset/source/threejs_marscloud.fbx"];
+    var resetRotateSpeed = 0.01;          //轨道恢复速度
+        resetScaleSpeed = 0.01;           //大小恢复速度
+  </script>    
+  <script src="js/LeapControls.js?v=1.0"></script>
+  <script src="js/planet.js"></script>
 </body>
 </html>

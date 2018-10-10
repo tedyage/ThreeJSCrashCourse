@@ -4,7 +4,7 @@ var touch1PositionX=0,                    //第一个触碰X坐标
     touch2PositionY=0,                    //第二个触碰Y坐标
     touchDistance=0;                     //两个触碰点间的距离
     rotateScale=0.5;                            //转动倍数
-var timeout;
+
 
 //自转物体方法
 var rotateModels = function(model,startRotation,deltaAngleX,deltaAngleY,speed){
