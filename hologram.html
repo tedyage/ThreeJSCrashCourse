@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/main.css"/>
   </head>
   <body  ontouchmove="event.preventDefault();">
-    <div id="output" style="color:#fff;position:absolute;top:8%;z-index:99">
+    <!--<div id="output" style="color:#fff;position:absolute;top:8%;z-index:99">
       <script type="text/html" id="template">
         <div>frame_id: {{frame_id}}</div>
         <div>hands_detected: {{hands_detected}}</div>
@@ -32,13 +32,13 @@
         </div>
         <div>Action:{{action}}</div>
       </script>
-    </div>
+    </div>-->
     <script src="js/three.min.js"></script>
     <script src="js/framerate.js"></script>
     <script src="js/inflate.min.js"></script>
     <script src="js/FBXLoader.js"></script>
     <script src="node_modules/leapjs/leap-0.6.4.min.js"></script>
-    <script src="node_modules/mustache/mustache.min.js"></script>
+    <!--<script src="node_modules/mustache/mustache.min.js"></script>-->
     <script>
       //摄像机z轴位置
       var cameraZ=250;
@@ -49,8 +49,9 @@
       var resetRotateSpeed = 0.01;          //轨道恢复速度
           resetScaleSpeed = 0.01;           //大小恢复速度
     </script>
-    <!--<script src="js/ModelTouchControls.js?v=1.2"></script>-->
-    <script src="js/LeapControls.js?v=1.0"></script>
     <script src="js/hologram.js?v=1.2"></script>
+    <script src="js/ModelTouchControls.js?v=1.2"></script>
+    <!--<script src="js/LeapControls.js?v=1.0"></script>-->
+    
   </body>
 </html>

@@ -291,6 +291,7 @@ var RaycastIntersect = function(handposition){
     data.IntersectX = intersects[0].point.x;
     data.IntersectY = intersects[0].point.y;
     data.IntersectZ = intersects[0].point.z;
+    console.log(intersects[0].face);
   }else{
     resetData();
   }
