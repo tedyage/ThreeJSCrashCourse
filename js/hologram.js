@@ -19,7 +19,7 @@ var rotateTypeArr=[],scaleTypeArr=[];
 //定义全息棱镜变的数量，初始为4
 var num = 4;
 //页面output的所需要参数
-//var template;
+var template;
 //倒计时
 var timeout;
 //初始化
@@ -29,8 +29,8 @@ var init = function(){
   initCamera();
   initRenderer();
 
-  //template = document.getElementById("template").innerHTML.trim();
-  //Mustache.parse(template);
+  template = document.getElementById("template").innerHTML.trim();
+  Mustache.parse(template);
 };
 
 //设置
@@ -255,7 +255,7 @@ var ModelScale = function(mesh,resetScaleSpeed){
 init();
 set();
 load();
-//resetData();
+resetData();
 
 var update = function(){
   if(touchDown||!isHandComplete)
@@ -274,35 +274,33 @@ var update = function(){
 
 //定义渲染函数，
 var render = function(){
-  //output.innerHTML = Mustache.render(template,data);
+  output.innerHTML = Mustache.render(template,data);
   renderer1.render(scene1,camera.clone());
   renderer2.render(scene2,camera.clone().translateX(-cameraZ).translateZ(-cameraZ).rotateY(-Math.PI/2).rotateZ(Math.PI/2));
   renderer3.render(scene3,camera.clone().translateZ(-cameraZ*2).rotateY(Math.PI).rotateZ(Math.PI));
   renderer4.render(scene4,camera.clone().translateX(cameraZ).translateZ(-cameraZ).rotateY(Math.PI/2).rotateZ(-Math.PI/2));
 };
 
-var GameLoop = function(){
-  requestAnimationFrame(GameLoop);
-  update();
-  render();
-};
-GameLoop();
-
 //定义循环执行函数
-/*var loop = function(){
+var loop = function(){
   try{
     Leap.loop(options,function(frame){
       update();
       render();
       handsDetectedFunction(frame);
     });
-    
+    //var GameLoop = function(){
+    //  requestAnimationFrame(GameLoop);
+    //  update();
+    //  render();
+    //};
+    //GameLoop();
   }
   catch(e){
     throw e;
   }
 };
 
-loop();*/
+loop();
 
 
